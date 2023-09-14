@@ -21,10 +21,10 @@ public class PictureService {
         }
     }
 
-    public void openPicture(String filePath) throws IOException {
+    public PicturePNM openPicture(String filePath) throws IOException {
         try {
             getType(filePath);
-            parser.parse(filePath);
+            return parser.parse(filePath);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }

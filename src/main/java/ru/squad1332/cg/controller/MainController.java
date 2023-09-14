@@ -9,11 +9,10 @@ import javafx.scene.image.PixelWriter;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import ru.squad1332.cg.controllers.PictureController;
+import ru.squad1332.cg.entities.PicturePNM;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class MainController {
     @FXML
@@ -25,34 +24,41 @@ public class MainController {
     @FXML
     private Button openButton;
     private File file;
+    private PictureController pictureController = new PictureController();
 
     @FXML
     protected void onOpen(MouseEvent event) {
         try {
-            BufferedReader reader = new BufferedReader(new FileReader(this.file));
-            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Pnm", "*.ppm");
+            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Pnm", "*.ppm", "*.pnm");
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().setAll(extensionFilter);
             File file = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
             if (file != null) {
+                PicturePNM picture = pictureController.openPicture(file.getPath());
                 PixelWriter pixelWriter = canvas.getGraphicsContext2D().getPixelWriter();
-                for (int w = 0; w < canvas.getWidth(); w++) {
-                    for (int h = 0; h < canvas.getHeight(); h++) {
-                        int random = ThreadLocalRandom.current().nextInt(0, 3);
-                        if (random == 0) {
-                            pixelWriter.setColor(w, h, Color.AZURE);
-                        }
-                        if (random == 1) {
-                            pixelWriter.setColor(w, h, Color.BLUE);
-                        }
-                        if (random == 2) {
-                            pixelWriter.setColor(w, h, Color.GREEN);
-                        }
-
+//                canvas.setWidth(picture.getWidth());
+//                canvas.setHeight(picture.getHeight());
+                System.out.println(picture.getWidth());
+                System.out.println(picture.getHeight());
+                int cnt = 1;
+                for (int h = 0; h < picture.getHeight(); h++) {
+                    for (int w = 0; w < picture.getWidth(); w++) {
+                        int[] rgb = picture.getPixelData()[h][w].getRgb();
+                        int r = (rgb[0] < 0) ? 127 + Math.abs(rgb[0]) : rgb[0];
+                        int g = (rgb[1] < 0) ? 127 + Math.abs(rgb[1]) : rgb[1];
+                        int b = (rgb[2] < 0) ? 127 + Math.abs(rgb[2]) : rgb[2];
+//                        int r = rgb[0] + 128;
+//                        int g = rgb[1] + 128;
+//                        int b = rgb[2] + 128;
+                        pixelWriter.setColor(w, h, Color.rgb(r, g, b));
+//                        System.out.print(cnt++ + " " + rgb[0] + " " + rgb[1] + " " + rgb[2] + " ");
+//                        System.out.println();
                     }
+//                    System.out.println();
                 }
             }
         } catch (Throwable e) {
+            System.out.println(e.getMessage());
             this.errorMessage.setText("Не удалось открыть изображение");
         }
     }

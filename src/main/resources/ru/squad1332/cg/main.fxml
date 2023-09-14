@@ -4,8 +4,8 @@
 <?import javafx.scene.canvas.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-
-<VBox alignment="CENTER" prefHeight="1000.0" prefWidth="1920.0" spacing="20.0" style="-fx-background-color: #9DBDEB;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.squad1332.cg.controller.MainController">
+<!--        style="-fx-background-color: #9DBDEB;"-->
+<VBox alignment="CENTER" prefHeight="1000.0" prefWidth="1920.0" spacing="20.0"  xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.squad1332.cg.controller.MainController">
     <padding>
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
