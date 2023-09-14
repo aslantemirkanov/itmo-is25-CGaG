@@ -23,7 +23,7 @@ public class HelloApplication extends Application {
         //launch();
         PictureService pictureService = new PictureService();
         try {
-            pictureService.openPicture("C:\\Users\\Aslan\\IdeaProjects\\itmo-is25-cg\\cg23-squad1332\\src\\main\\resources\\ru\\squad1332\\LineBachground.ppm");
+            pictureService.openPicture("/home/alexchamp/Desktop/cg/src/main/resources/ru/squad1332/225H_RGB.ppm");
             System.out.println("!!!!!!!!!!!!!!!!!!");
         } catch (IOException e) {
             throw new RuntimeException(e);

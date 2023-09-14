@@ -4,71 +4,48 @@ import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;
 import ru.squad1332.cg.entities.Pixel;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class ParserPNM implements Parser {
     @Override
     public Picture parse(String path) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(path));
-        char[] buf = new char[1026];
-        reader.read(buf);
-        int bufSize = 1026;
-        int offset=0;
-        int byteCount = 0;
-        while ((byteCount = (reader.read(buf, offset, bufSize))) != -1){
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
 
-        }
-        PicturePNM picture = new PicturePNM();
+            PicturePNM picture = new PicturePNM();
+            picture.setFormatType(reader.readLine().trim());
 
-        // Прочитать заголовок (P1, P2, P3 или P4)
-        picture.setFormatType(reader.readLine().trim());
 
-        // Пропустить комментарии
-        String line = reader.readLine();
+            String[] dimensions = reader.readLine().trim().split("\\s+");
+            picture.setWidth(Integer.parseInt(dimensions[0]));
+            picture.setHeight(Integer.parseInt(dimensions[1]));
+            picture.setMaxColorValue(Integer.parseInt(reader.readLine().trim()));
 
-        // Прочитать ширину и высоту
-        String[] dimensions = line.trim().split("\\s+");
-        picture.setWidth(Integer.parseInt(dimensions[0]));
-        picture.setHeight(Integer.parseInt(dimensions[1]));
-        picture.setMaxColorValue(Integer.parseInt(reader.readLine().trim()));
+            char[] buffer = new char[1026];
+            int bufferSize = 1026;
+            int offset = 0;
+            int byteCount = 0;
 
-        String byteData = reader.readLine();
-        System.out.println(byteData.length());
-        // Прочитать данные пикселей
-        Pixel[][] pixelData = new Pixel[picture.getHeight()][picture.getWidth()];
-
-        for (int i = 0; i < picture.getHeight(); ++i){
-            for (int j = 0; j < picture.getWidth() * 3 - 1; j += 3){
-                int red = (int)(byteData.charAt(i * picture.getWidth() + j));
-                int green = (int)(byteData.charAt(i * picture.getWidth() + j + 1));
-                int blue = (int)(byteData.charAt(i * picture.getWidth() + j + 2));
-                pixelData[i][j/3] = (new Pixel(red, green, blue));
-            }
-        }
-
-        if (picture.getFormatType().equals("P5")) {
-            for (int i = 0; i < picture.getHeight(); ++i) {
-                for (int j = 0; j < picture.getWidth(); ++j) {
-                    Pixel newPixel = new Pixel(reader.read(), 0, 0);
-                    pixelData[i][j] = newPixel;
+            Pixel[][] pixelData = new Pixel[picture.getHeight()][picture.getWidth()];
+            int h = 0;
+            int w = 0;
+            while ((byteCount = (reader.read(buffer, offset, bufferSize))) != -1) {
+                for (int b = 0; b < byteCount; b += 3) {
+                    int red = buffer[b];
+                    int green = buffer[b + 1];
+                    int blue = buffer[b + 2];
+                    pixelData[((w + 1 >= picture.getWidth()) ? h++ : h) % picture.getHeight()][(w++) % picture.getWidth()] = new Pixel(red, green, blue);
                 }
             }
+
+            picture.setPixelData(pixelData);
+            System.out.println(bufferSize);
+            System.out.println(offset);
+            return picture;
+        } catch (IOException e) {
+            throw e;
         }
 
-        if (picture.getFormatType().equals("P6")) {
-            for (int i = 0; i < picture.getHeight(); ++i) {
-                for (int j = 0; j < picture.getWidth(); ++j) {
-                    Pixel newPixel = new Pixel(reader.read(), reader.read(), reader.read());
-                    pixelData[i][j] = newPixel;
-                }
-            }
-        }
-
-
-
-        picture.setPixelData(pixelData);
-        reader.close();
-
-        return new PicturePNM();
     }
 }
