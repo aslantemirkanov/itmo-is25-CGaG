@@ -1,10 +1,13 @@
-module ru.squad1337.cg {
+module ru.squad1332.cg {
     requires javafx.controls;
     requires javafx.fxml;
 
     requires com.dlsc.formsfx;
     requires org.kordamp.ikonli.javafx;
+    requires lombok;
 
-    opens ru.squad1337.cg to javafx.fxml;
-    exports ru.squad1337.cg;
+    opens ru.squad1332.cg to javafx.fxml;
+    exports ru.squad1332.cg;
+    exports ru.squad1332.cg.controllers;
+    opens ru.squad1332.cg.controllers to javafx.fxml;
 }
