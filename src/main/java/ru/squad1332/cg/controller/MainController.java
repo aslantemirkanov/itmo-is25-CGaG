@@ -5,6 +5,7 @@ import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
@@ -39,23 +40,29 @@ public class MainController {
                 canvas.setWidth(picture.getWidth());
                 canvas.setHeight(picture.getHeight());
                 int cnt = 1;
-                for (int h = 0; h < picture.getHeight(); h++) {
-                    for (int w = 0; w < picture.getWidth(); w++) {
-
-                        int[] rgb = picture.getPixelData()[h][w].getRgb();
-                        if (rgb[0] == 0 && rgb[2] == 0) {
-                            System.out.println(rgb[1]);
-                        }
-//                        double r = (rgb[0] + 128) / 255.0;
-//                        double g = (rgb[1] + 128) / 255.0;
-//                        double b = (rgb[2] + 128) / 255.0;
-                        double r = ((rgb[0] < 0) ? 256 + rgb[0] : rgb[0]) / 255.0;
-                        double g = ((rgb[1] < 0) ? 256 + rgb[1] : rgb[1]) / 255.0;
-                        double b = ((rgb[2] < 0) ? 256 + rgb[2] : rgb[2]) / 255.0;
-
-                        pixelWriter.setColor(w, h, new Color(r, g, b, 1.0));
-                    }
-                }
+                pixelWriter.setPixels(0, 0,
+                        picture.getWidth(), picture.getHeight(),
+                        PixelFormat.getIntArgbPreInstance(), picture.getPixelData(),
+                        0, picture.getWidth());
+//                for (int h = 0; h < picture.getHeight(); h++) {
+//                    for (int w = 0; w < picture.getWidth(); w++) {
+//
+//                        int[] rgb = picture.getPixelData()[h][w].getRgb();
+//                        if (rgb[0] == 0 && rgb[2] == 0) {
+//                            System.out.println(rgb[1]);
+//                        }
+//
+//                        pixelWriter.setPixels(0, 0);
+////                        double r = (rgb[0] + 128) / 255.0;
+////                        double g = (rgb[1] + 128) / 255.0;
+////                        double b = (rgb[2] + 128) / 255.0;
+//                        double r = ((rgb[0] < 0) ? 256 + rgb[0] : rgb[0]) / 255.0;
+//                        double g = ((rgb[1] < 0) ? 256 + rgb[1] : rgb[1]) / 255.0;
+//                        double b = ((rgb[2] < 0) ? 256 + rgb[2] : rgb[2]) / 255.0;
+//
+//                        pixelWriter.setColor(w, h, new Color(r, g, b, 1.0));
+//                    }
+//                }
             }
         } catch (Throwable e) {
             System.out.println(e.getMessage());

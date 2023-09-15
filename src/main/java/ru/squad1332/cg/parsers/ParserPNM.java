@@ -1,7 +1,6 @@
 package ru.squad1332.cg.parsers;
 
 import ru.squad1332.cg.entities.PicturePNM;
-import ru.squad1332.cg.entities.Pixel;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -36,22 +35,17 @@ public class ParserPNM implements Parser {
             int offset = 0;
             int byteCount = 0;
 
-            Pixel[][] pixelData = new Pixel[picture.getHeight()][picture.getWidth()];
+            int[] pixelData = new int[picture.getHeight() * picture.getWidth()];
             int h = 0;
             int w = 0;
+            int p = 0;
             while ((byteCount = (reader.read(buffer, offset, bufferSize))) != -1) {
                 for (int b = 0; b < byteCount; b += 3) {
-                    int red = buffer[b];
-                    int green = buffer[b + 1];
-                    int blue = buffer[b + 2];
-                    if (red == 0 && green == -128 && blue == 0) {
-                        System.out.println(red + " " + green + " " + blue);
-                    }
-                    pixelData[h][w++] = new Pixel(red, green, blue);
-                    if (w % picture.getWidth() == 0) {
-                        h++;
-                        w = 0;
-                    }
+                    int r = ((buffer[b] < 0) ? 256 + buffer[b] : buffer[b]);
+                    int g = ((buffer[b + 1] < 0) ? 256 + buffer[b + 1] : buffer[b + 1]);
+                    int bl = ((buffer[b + 2] < 0) ? 256 + buffer[b + 2] : buffer[b + 2]);
+                    int alpha = 255;
+                    pixelData[p++] = (alpha << 24) + (r << 16) + (g << 8) + (bl);
                 }
             }
 

@@ -6,7 +6,7 @@ public class PicturePNM implements Picture {
     private int width;
     private int height;
     private int maxColorValue;
-    private Pixel[][] pixelData;
+    private int[] pixelData;
 
     public String getFormatType() {
         return formatType;
@@ -40,12 +40,11 @@ public class PicturePNM implements Picture {
         this.maxColorValue = maxColorValue;
     }
 
-    @Override
-    public Pixel[][] getPixelData() {
+    public int[] getPixelData() {
         return pixelData;
     }
 
-    public void setPixelData(Pixel[][] pixelData) {
+    public void setPixelData(int[] pixelData) {
         this.pixelData = pixelData;
     }
 }
