@@ -28,15 +28,15 @@
                     </HBox.margin>
                 </Button>
 
-                <Button fx:id="saveButton" mnemonicParsing="false" onMouseClicked="#onSave"
-                        stylesheets="@css/button.css" text="Сохранить">
-                    <HBox.margin>
-                        <Insets left="5.0"/>
-                    </HBox.margin>
-                </Button>
+<!--                <Button fx:id="saveButton" mnemonicParsing="false" onMouseClicked="#onSave"-->
+<!--                        stylesheets="@css/button.css" text="Сохранить">-->
+<!--                    <HBox.margin>-->
+<!--                        <Insets left="5.0"/>-->
+<!--                    </HBox.margin>-->
+<!--                </Button>-->
 
                 <Button fx:id="saveAsButton" mnemonicParsing="false" onMouseClicked="#onSaveAs"
-                        stylesheets="@css/button.css" text="Сохранить как">
+                        stylesheets="@css/button.css" text="Сохранить">
                     <HBox.margin>
                         <Insets left="5.0"/>
                     </HBox.margin>

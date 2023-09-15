@@ -8,12 +8,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import ru.squad1332.cg.controllers.PictureController;
 import ru.squad1332.cg.entities.Picture;
-import ru.squad1332.cg.entities.PicturePNM;
 
 import java.io.File;
 
@@ -38,6 +35,7 @@ public class MainController {
     @FXML
     protected void onOpen(MouseEvent event) {
         try {
+            this.errorMessage.setText("");
             FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Pnm", "*.ppm", "*.pnm", "*.pgm");
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().setAll(extensionFilter);
@@ -64,6 +62,7 @@ public class MainController {
     @FXML
     protected void onSave(MouseEvent event) {
         try {
+            this.errorMessage.setText("");
             String path = picture.getPath();
             System.out.println(path);
         } catch (Throwable e) {
@@ -74,15 +73,15 @@ public class MainController {
     @FXML
     protected void onSaveAs(MouseEvent event) {
         try {
-            DirectoryChooser directoryChooser = new DirectoryChooser();
-            directoryChooser.setTitle("Выберите директорию");
-            File selectedDirectory = directoryChooser.showDialog(((Node) event.getSource()).getScene().getWindow());
-            String path = selectedDirectory.getAbsolutePath();
-            picture.setPath(path);
-            picture.getFile();
-
-
+            this.errorMessage.setText("");
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Выберите файл");
+            File selectedFile = fileChooser.showSaveDialog(((Node) event.getSource()).getScene().getWindow());
+            if (selectedFile != null) {
+                picture.writeToFile(selectedFile);
+            }
         } catch (Throwable e) {
+            System.out.println(e.getMessage());
             this.errorMessage.setText("Не удалось сохранить изображение");
         }
     }

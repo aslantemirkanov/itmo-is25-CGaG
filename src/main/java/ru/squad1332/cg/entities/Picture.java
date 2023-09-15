@@ -10,5 +10,5 @@ public interface Picture {
 
     String getPath();
     void setPath(String path);
-    File getFile();
+    void writeToFile(File file);
 }

@@ -66,14 +66,8 @@ public class PicturePNM implements Picture {
     }
 
     @Override
-    public File getFile() {
-        try {
-            path = path + "\\new.pnm";
-            File file = new File(path);
-            FileWriter fileWriter = new FileWriter(file);
-
-            OutputStream fileOutputStream =  Files.newOutputStream(Path.of(path));
-            DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+    public void writeToFile(File file) {
+        try(DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
 
             dataOutputStream.writeBytes(formatType + (char) (10));
             dataOutputStream.writeBytes(String.valueOf(width) + (char) (10) + String.valueOf(height) + (char) (10));
@@ -108,8 +102,6 @@ public class PicturePNM implements Picture {
                 dataOutputStream.close();
             }
 
-            fileWriter.close();
-            return file;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
