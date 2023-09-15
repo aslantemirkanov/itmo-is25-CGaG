@@ -3,7 +3,7 @@ package ru.squad1332.cg.entities;
 import java.io.File;
 
 public interface Picture {
-    Pixel[][] getPixelData();
+    int[] getPixelData();
     String getFormatType();
     int getWidth();
     int getHeight();

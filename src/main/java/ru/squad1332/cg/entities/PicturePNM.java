@@ -35,6 +35,16 @@ public class PicturePNM implements Picture {
         return height;
     }
 
+    @Override
+    public String getPath() {
+        return null;
+    }
+
+    @Override
+    public void setPath(String path) {
+
+    }
+
     public void setHeight(int height) {
         this.height = height;
     }
@@ -48,11 +58,11 @@ public class PicturePNM implements Picture {
     }
 
     @Override
-    public Pixel[][] getPixelData() {
+    public int[] getPixelData() {
         return pixelData;
     }
 
-    public void setPixelData(Pixel[][] pixelData) {
+    public void setPixelData(int[] pixelData) {
         this.pixelData = pixelData;
     }
 
