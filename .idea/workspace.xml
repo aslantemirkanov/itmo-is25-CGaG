@@ -7,9 +7,7 @@
     <list default="true" id="054bfbd5-c489-4f0c-9501-e7b60e020db0" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/controller/MainController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/entities/Picture.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/entities/Picture.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/entities/PicturePNM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/entities/PicturePNM.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/parsers/ParserPNM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/parsers/ParserPNM.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ru/squad1332/cg/main.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ru/squad1332/cg/main.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,24 +46,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;1-lab&quot;,
-    &quot;jdk.selected.JAVA_MODULE&quot;: &quot;corretto-17&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/alexchamp/Desktop/cg&quot;,
-    &quot;list.type.of.created.stylesheet&quot;: &quot;CSS&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.importing&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "1-lab-interface",
+    "jdk.selected.JAVA_MODULE": "corretto-17",
+    "last_opened_file_path": "/home/alexchamp/Desktop/cg",
+    "list.type.of.created.stylesheet": "CSS",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "reference.settings.project.maven.importing",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$" />
@@ -114,6 +112,7 @@
       <workItem from="1694729295131" duration="139000" />
       <workItem from="1694735732907" duration="1703000" />
       <workItem from="1694773864592" duration="7119000" />
+      <workItem from="1694782594628" duration="1012000" />
     </task>
     <servers />
   </component>
@@ -138,11 +137,6 @@
           <url>file://$PROJECT_DIR$/src/main/java/ru/squad1332/cg/controller/CanvasController.java</url>
           <line>16</line>
           <option name="timeStamp" value="4" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/ru/squad1332/cg/controller/MainController.java</url>
-          <line>46</line>
-          <option name="timeStamp" value="5" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
