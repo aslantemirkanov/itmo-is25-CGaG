@@ -39,10 +39,7 @@ public class ParserPNM implements Parser {
             Pixel[][] pixelData = new Pixel[picture.getHeight()][picture.getWidth()];
             int h = 0;
             int w = 0;
-            int cnt = 0;
             while ((byteCount = (reader.read(buffer, offset, bufferSize))) != -1) {
-                cnt += byteCount;
-//                System.out.println(cnt);
                 for (int b = 0; b < byteCount; b += 3) {
                     int red = buffer[b];
                     int green = buffer[b + 1];
@@ -54,11 +51,8 @@ public class ParserPNM implements Parser {
                     }
                 }
             }
-            System.out.println(h + " " + w);
 
             picture.setPixelData(pixelData);
-            System.out.println(bufferSize);
-            System.out.println(offset);
             return picture;
         } catch (IOException e) {
             throw e;
