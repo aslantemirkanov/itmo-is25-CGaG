@@ -9,8 +9,10 @@ import javafx.scene.image.PixelFormat;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
+import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import ru.squad1332.cg.controllers.PictureController;
+import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;
 
 import java.io.File;
@@ -24,19 +26,27 @@ public class MainController {
     private Label filename;
     @FXML
     private Button openButton;
+    @FXML
+    private Button saveButton;
+    @FXML
+    private Button saveAsButton;
     private File file;
+
+    private Picture picture;
     private PictureController pictureController = new PictureController();
 
     @FXML
     protected void onOpen(MouseEvent event) {
         try {
-            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Pnm", "*.ppm", "*.pnm");
+            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Pnm", "*.ppm", "*.pnm", "*.pgm");
             FileChooser fileChooser = new FileChooser();
             fileChooser.getExtensionFilters().setAll(extensionFilter);
             File file = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
             if (file != null) {
                 PicturePNM picture = pictureController.openPicture(file.getPath());
                 PixelWriter pixelWriter = canvas.getGraphicsContext2D().getPixelWriter();
+//                canvas.setScaleY(10);
+//                canvas.setScaleX(10);
                 canvas.setWidth(picture.getWidth());
                 canvas.setHeight(picture.getHeight());
                 int cnt = 1;
@@ -73,10 +83,24 @@ public class MainController {
     @FXML
     protected void onSave(MouseEvent event) {
         try {
-            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Pnm", "*.ppm");
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.getExtensionFilters().setAll(extensionFilter);
-            fileChooser.showSaveDialog(((Node) event.getSource()).getScene().getWindow());
+            String path = picture.getPath();
+            System.out.println(path);
+        } catch (Throwable e) {
+            this.errorMessage.setText("Не удалось сохранить изображение");
+        }
+    }
+
+    @FXML
+    protected void onSaveAs(MouseEvent event) {
+        try {
+            DirectoryChooser directoryChooser = new DirectoryChooser();
+            directoryChooser.setTitle("Выберите директорию");
+            File selectedDirectory = directoryChooser.showDialog(((Node) event.getSource()).getScene().getWindow());
+            String path = selectedDirectory.getAbsolutePath();
+            picture.setPath(path);
+            picture.getFile();
+
+
         } catch (Throwable e) {
             this.errorMessage.setText("Не удалось сохранить изображение");
         }
