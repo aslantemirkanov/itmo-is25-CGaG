@@ -15,6 +15,7 @@ public class ParserPNM implements Parser {
              BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
 
             PicturePNM picture = new PicturePNM();
+            picture.setPath(path);
             //Получение формата
             picture.setFormatType(bufferedReader.readLine().trim());
 
