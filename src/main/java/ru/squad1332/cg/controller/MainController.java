@@ -36,8 +36,10 @@ public class MainController {
             if (file != null) {
                 PicturePNM picture = pictureController.openPicture(file.getPath());
                 PixelWriter pixelWriter = canvas.getGraphicsContext2D().getPixelWriter();
-//                canvas.setWidth(picture.getWidth());
-//                canvas.setHeight(picture.getHeight());
+                canvas.setScaleY(10);
+                canvas.setScaleX(10);
+                canvas.setWidth(picture.getWidth());
+                canvas.setHeight(picture.getHeight());
                 System.out.println(picture.getWidth());
                 System.out.println(picture.getHeight());
                 int cnt = 1;

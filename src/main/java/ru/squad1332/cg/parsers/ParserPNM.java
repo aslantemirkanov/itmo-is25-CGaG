@@ -31,7 +31,7 @@ public class ParserPNM implements Parser {
                 }
             }
 
-            int bufferSize = 1026;
+            int bufferSize = 8193;
             byte[] buffer = new byte[bufferSize];
             int offset = 0;
             int byteCount = 0;
