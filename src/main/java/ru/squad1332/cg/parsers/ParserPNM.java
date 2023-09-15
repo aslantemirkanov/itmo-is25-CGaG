@@ -44,6 +44,9 @@ public class ParserPNM implements Parser {
                     int red = buffer[b];
                     int green = buffer[b + 1];
                     int blue = buffer[b + 2];
+                    if (red == 0 && green == -128 && blue == 0) {
+                        System.out.println(red + " " + green + " " + blue);
+                    }
                     pixelData[h][w++] = new Pixel(red, green, blue);
                     if (w % picture.getWidth() == 0) {
                         h++;

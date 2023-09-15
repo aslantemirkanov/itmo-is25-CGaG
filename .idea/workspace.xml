@@ -5,7 +5,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="054bfbd5-c489-4f0c-9501-e7b60e020db0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/controller/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/controller/MainController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/parsers/ParserPNM.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ru/squad1332/cg/parsers/ParserPNM.java" afterDir="false" />
@@ -75,7 +74,7 @@
     </key>
   </component>
   <component name="RunManager">
-    <configuration name="ru.squad1332.cg.HelloApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+    <configuration name="HelloApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="ru.squad1332.cg.HelloApplication" />
       <module name="cg" />
       <extension name="coverage">
@@ -90,7 +89,7 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.ru.squad1332.cg.HelloApplication" />
+        <item itemvalue="Application.HelloApplication" />
       </list>
     </recent_temporary>
   </component>
@@ -112,7 +111,7 @@
       <workItem from="1694714474938" duration="13914000" />
       <workItem from="1694729295131" duration="139000" />
       <workItem from="1694735732907" duration="1703000" />
-      <workItem from="1694773864592" duration="624000" />
+      <workItem from="1694773864592" duration="2566000" />
     </task>
     <servers />
   </component>
@@ -137,6 +136,11 @@
           <url>file://$PROJECT_DIR$/src/main/java/ru/squad1332/cg/controller/CanvasController.java</url>
           <line>16</line>
           <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/ru/squad1332/cg/controller/MainController.java</url>
+          <line>41</line>
+          <option name="timeStamp" value="5" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
