@@ -13,11 +13,11 @@ public class PictureService {
     private String path;
 
     private void getType(String filePath) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(filePath));
-
-        String type = reader.readLine().trim();
-        if (type.equals("P5") || type.equals("P6")){
-            parser = new ParserPNM();
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String type = reader.readLine().trim();
+            if (type.equals("P5") || type.equals("P6")) {
+                parser = new ParserPNM();
+            }
         }
     }
 

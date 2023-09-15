@@ -23,7 +23,7 @@ public class ButtonsController {
         Stage stage = (Stage) node.getScene().getWindow();
         stage.close();
         try {
-            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Pnm", "*.ppm");
+            FileChooser.ExtensionFilter extensionFilter = new FileChooser.ExtensionFilter("Pnm", "*.ppm", "*.pgm");
             FileChooser fileChooser = new FileChooser();
 //            fileChooser.getExtensionFilters().setAll(extensionFilter);
             File file = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getRoot().getScene().getWindow());
