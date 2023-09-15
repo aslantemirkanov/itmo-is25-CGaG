@@ -40,8 +40,6 @@ public class ParserPNM implements Parser {
             int byteCount = 0;
 
             int[] pixelData = new int[picture.getHeight() * picture.getWidth()];
-            int h = 0;
-            int w = 0;
             int p = 0;
             if (picture.getFormatType().equals("P6")) {
                 while ((byteCount = (reader.read(buffer, offset, bufferSize))) != -1) {

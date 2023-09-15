@@ -9,7 +9,7 @@ import java.io.*;
 
 public class PictureService {
     private Picture picture;
-    private Parser parser;
+    private Parser parser = new ParserPNM();
     private String path;
 
     private void getType(String filePath) throws IOException {

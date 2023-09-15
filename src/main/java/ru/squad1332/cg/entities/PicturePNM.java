@@ -70,7 +70,7 @@ public class PicturePNM implements Picture {
         try(DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
 
             dataOutputStream.writeBytes(formatType + (char) (10));
-            dataOutputStream.writeBytes(String.valueOf(width) + (char) (10) + String.valueOf(height) + (char) (10));
+            dataOutputStream.writeBytes(String.valueOf(width) + (char) (32) + String.valueOf(height) + (char) (10));
             dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
 
             if (formatType.equals("P6")) {
