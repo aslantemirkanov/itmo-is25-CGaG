@@ -43,7 +43,7 @@ public class MainController {
             fileChooser.getExtensionFilters().setAll(extensionFilter);
             File file = fileChooser.showOpenDialog(((Node) event.getSource()).getScene().getWindow());
             if (file != null) {
-                PicturePNM picture = pictureController.openPicture(file.getPath());
+                picture = pictureController.openPicture(file.getPath());
                 PixelWriter pixelWriter = canvas.getGraphicsContext2D().getPixelWriter();
 
                 canvas.setWidth(picture.getWidth());

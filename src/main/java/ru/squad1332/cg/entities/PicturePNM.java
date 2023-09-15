@@ -1,10 +1,9 @@
 package ru.squad1332.cg.entities;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class PicturePNM implements Picture {
     private String formatType;
@@ -42,7 +41,7 @@ public class PicturePNM implements Picture {
 
     @Override
     public void setPath(String path) {
-
+        this.path = path;
     }
 
     public void setHeight(int height) {
@@ -72,34 +71,43 @@ public class PicturePNM implements Picture {
             path = path + "\\new.pnm";
             File file = new File(path);
             FileWriter fileWriter = new FileWriter(file);
-            fileWriter.wr
-            BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-            bufferedWriter.write(formatType + (char) (10));
-            bufferedWriter.write(String.valueOf(width) + (char) (10) + String.valueOf(height) + (char) (10));
-            bufferedWriter.write(String.valueOf(maxColorValue) + (char) (10));
-            bufferedWriter.wr
-            StringBuilder data = new StringBuilder();
-            if (formatType.equals("P5")) {
-                for (int i = 0; i < height; i++) {
-                    for (int j = 0; j < width; j++) {
-                        data.append((char) pixelData[i][j].getRgb()[0]);
-                    }
-                }
-            }
+
+            OutputStream fileOutputStream =  Files.newOutputStream(Path.of(path));
+            DataOutputStream dataOutputStream = new DataOutputStream(fileOutputStream);
+
+            dataOutputStream.writeBytes(formatType + (char) (10));
+            dataOutputStream.writeBytes(String.valueOf(width) + (char) (10) + String.valueOf(height) + (char) (10));
+            dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
+
             if (formatType.equals("P6")) {
-                for (int i = 0; i < height; i++) {
-                    for (int j = 0; j < width; j++) {
-                        data.append((char) (pixelData[i][j].getRgb()[0] < 0 ? 256 + pixelData[i][j].getRgb()[0] :
-                                pixelData[i][j].getRgb()[0]));
-                        data.append((char) (pixelData[i][j].getRgb()[1] < 0 ? 256 + pixelData[i][j].getRgb()[1] :
-                                pixelData[i][j].getRgb()[1]));
-                        data.append((char) (pixelData[i][j].getRgb()[2] < 0 ? 256 + pixelData[i][j].getRgb()[2] :
-                                pixelData[i][j].getRgb()[2]));
-                    }
+                byte[] pixels = new byte[3 * height * width];
+                int cur = 0;
+                for (int i = 0; i < pixelData.length; i++) {
+                    cur = i * 3;
+                    int curPixel = pixelData[i];
+                    int alpha = ((curPixel >> 24) & 0xff);
+                    int red = ((curPixel >> 16) & 0xff);
+                    int green = ((curPixel >> 8) & 0xff);
+                    int blue = ((curPixel) & 0xff);
+                    pixels[cur] = (byte) (red > 127 ? red - 256 : red);
+                    pixels[cur + 1] = (byte) (green > 127 ? green - 256 : green);
+                    pixels[cur + 2] = (byte) (blue > 127 ? blue - 256 : blue);
                 }
+                dataOutputStream.write(pixels);
+                dataOutputStream.close();
             }
-            bufferedWriter.write(String.valueOf(data));
-            bufferedWriter.close();
+
+            if (formatType.equals("P5")){
+                byte[] pixels = new byte[height * width];
+                for (int i = 0; i < pixelData.length; i++) {
+                    int curPixel = pixelData[i];
+                    int red = ((curPixel >> 16) & 0xff);
+                    pixels[i] = (byte) (red > 127 ? red - 256 : red);
+                }
+                dataOutputStream.write(pixels);
+                dataOutputStream.close();
+            }
+
             fileWriter.close();
             return file;
         } catch (IOException e) {
