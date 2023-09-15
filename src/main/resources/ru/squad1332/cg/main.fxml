@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--        style="-fx-background-color: #9DBDEB;"-->
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" prefHeight="1000.0" prefWidth="1920.0"
+      spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
+      fx:controller="ru.squad1332.cg.controller.MainController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+    </padding>
+    <children>
+        <Label fx:id="filename" text="Выберите фото"/>
+        <ScrollPane>
+            <Canvas fx:id="canvas" height="900.0" width="1900.0">
+            </Canvas>
+        </ScrollPane>
+        <Label fx:id="errorMessage" textFill="RED"/>
+        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
+            <children>
+                <Button fx:id="openButton" mnemonicParsing="false" onMouseClicked="#onOpen"
+                        stylesheets="@css/button.css" text="Открыть">
+                    <HBox.margin>
+                        <Insets right="5.0"/>
+                    </HBox.margin>
+                </Button>
+
+<!--                <Button fx:id="saveButton" mnemonicParsing="false" onMouseClicked="#onSave"-->
+<!--                        stylesheets="@css/button.css" text="Сохранить">-->
+<!--                    <HBox.margin>-->
+<!--                        <Insets left="5.0"/>-->
+<!--                    </HBox.margin>-->
+<!--                </Button>-->
+
+                <Button fx:id="saveAsButton" mnemonicParsing="false" onMouseClicked="#onSaveAs"
+                        stylesheets="@css/button.css" text="Сохранить">
+                    <HBox.margin>
+                        <Insets left="5.0"/>
+                    </HBox.margin>
+                </Button>
+<!--                -->
+<!--                <Button mnemonicParsing="false" stylesheets="@css/button.css" text="Сохранить">-->
+<!--                    <HBox.margin>-->
+<!--                        <Insets left="5.0"/>-->
+<!--                    </HBox.margin>-->
+<!--                </Button>-->
+            </children>
+        </HBox>
+
+    </children>
+</VBox>
