@@ -1,54 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--        style="-fx-background-color: #9DBDEB;"-->
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.canvas.Canvas?>
+
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="CENTER" prefHeight="1000.0" prefWidth="1920.0"
-      spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea"
-      fx:controller="ru.squad1332.cg.controller.MainController">
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import com.sun.javafx.scene.control.ContextMenuContent.ArrowMenuItem?>
+<VBox alignment="CENTER" prefHeight="1000.0" prefWidth="1920.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.squad1332.cg.controller.MainController">
+
     <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0"/>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
+
     <children>
-        <Label fx:id="filename" text="Выберите фото"/>
+    <MenuBar fx:id="menu">
+        <menus>
+            <Menu mnemonicParsing="false" text="Файл">
+                <items>
+                    <MenuItem mnemonicParsing="false" onAction="#onOpen" text="Открыть" />
+                    <MenuItem mnemonicParsing="false" onAction="#onSaveAs" text="Сохранить" />
+                </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Цветовые пространства">
+                <items>
+                    <Menu mnemonicParsing="false" text="RGB">
+                        <items>
+                            <MenuItem mnemonicParsing="false" onAction="#onToRgb" text="rgb"/>
+                            <MenuItem mnemonicParsing="false" onAction="#onToRed" text="red"/>
+                            <MenuItem mnemonicParsing="false" onAction="#onToGreen" text="green"/>
+                            <MenuItem mnemonicParsing="false" onAction="#onToBlue" text="blue"/>
+                        </items>
+                    </Menu>
+                </items>
+                <Menu mnemonicParsing="false" text="HSL">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onToHsl" text="hsl"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onToHue" text="hue"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onToSaturation" text="saturation"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onToLightness" text="lightness"/>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="HSV">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onToHsv" text="hsv"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onToHsvHue" text="hue"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onToHsvSaturation" text="saturation"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onToHsvValue" text="value"/>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="YCbCr601">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onYCbCr601" text="YCbCr"/>
+                        <MenuItem mnemonicParsing="false" onAction="#Y601" text="Y"/>
+                        <MenuItem mnemonicParsing="false" onAction="#Cb601" text="Cb"/>
+                        <MenuItem mnemonicParsing="false" onAction="#Cr601" text="Cr"/>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="YCbCr709">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onYCbCr709" text="YCbCr"/>
+                        <MenuItem mnemonicParsing="false" onAction="#Y709" text="Y"/>
+                        <MenuItem mnemonicParsing="false" onAction="#Cb709" text="Cb"/>
+                        <MenuItem mnemonicParsing="false" onAction="#Cr709" text="Cr"/>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="YCoCg">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onYCoCg" text="YCoCg"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onY" text="Y"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onCo" text="Co"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onCg" text="Cg"/>
+                    </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="CMY">
+                    <items>
+                        <MenuItem mnemonicParsing="false" onAction="#onCmy" text="CMY"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onCmyC" text="C"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onCmyM" text="M"/>
+                        <MenuItem mnemonicParsing="false" onAction="#onCmyY" text="Y"/>
+                    </items>
+                </Menu>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Help">
+                <items>
+                    <MenuItem mnemonicParsing="false" text="About" />
+                </items>
+            </Menu>
+        </menus>
+    </MenuBar>
+        <Label fx:id="filename" text="Выберите фото" />
         <ScrollPane>
-            <Canvas fx:id="canvas" height="900.0" width="1900.0">
+            <Canvas fx:id="canvas" height="300.0" width="500.0">
             </Canvas>
         </ScrollPane>
-        <Label fx:id="errorMessage" textFill="RED"/>
-        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0">
-            <children>
-                <Button fx:id="openButton" mnemonicParsing="false" onMouseClicked="#onOpen"
-                        stylesheets="@css/button.css" text="Открыть">
-                    <HBox.margin>
-                        <Insets right="5.0"/>
-                    </HBox.margin>
-                </Button>
-
-<!--                <Button fx:id="saveButton" mnemonicParsing="false" onMouseClicked="#onSave"-->
-<!--                        stylesheets="@css/button.css" text="Сохранить">-->
-<!--                    <HBox.margin>-->
-<!--                        <Insets left="5.0"/>-->
-<!--                    </HBox.margin>-->
-<!--                </Button>-->
-
-                <Button fx:id="saveAsButton" mnemonicParsing="false" onMouseClicked="#onSaveAs"
-                        stylesheets="@css/button.css" text="Сохранить">
-                    <HBox.margin>
-                        <Insets left="5.0"/>
-                    </HBox.margin>
-                </Button>
-<!--                -->
-<!--                <Button mnemonicParsing="false" stylesheets="@css/button.css" text="Сохранить">-->
-<!--                    <HBox.margin>-->
-<!--                        <Insets left="5.0"/>-->
-<!--                    </HBox.margin>-->
-<!--                </Button>-->
-            </children>
-        </HBox>
+        <Label fx:id="errorMessage" textFill="RED" />
 
     </children>
 </VBox>

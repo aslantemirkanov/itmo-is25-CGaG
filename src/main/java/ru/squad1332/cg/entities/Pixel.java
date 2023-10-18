@@ -1,17 +1,42 @@
 package ru.squad1332.cg.entities;
 
+import java.util.Arrays;
+
 public class Pixel {
-    private int[] rgb;
+    private double[] rgba;
 
-    public Pixel(int red, int green, int blue) {
-        rgb = new int[]{red, green, blue};
+    public Pixel(double red, double green, double blue, double alpha) {
+        this.rgba = new double[]{red, green, blue, alpha};
     }
 
-    public int[] getRgb() {
-        return rgb;
+    public double[] getRgba() {
+        return rgba;
     }
 
-    public void setRgb(int[] rgb) {
-        this.rgb = rgb;
+    public void setRgb(double[] rgba) {
+        if (rgba.length != 4) {
+            for (double i : rgba) {
+                if (i < 0 || i > 1) {
+                    throw new IllegalArgumentException("Expected array of rgba, but get: " + Arrays.toString(rgba));
+                }
+            }
+        }
+        this.rgba = rgba;
+    }
+
+    public double getRed() {
+        return rgba[0];
+    }
+
+    public double getGreen() {
+        return rgba[1];
+    }
+
+    public double getBlue() {
+        return rgba[2];
+    }
+
+    public double getAlpha() {
+        return rgba[3];
     }
 }

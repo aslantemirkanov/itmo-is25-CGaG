@@ -1,9 +1,12 @@
 package ru.squad1332.cg.entities;
 
+import ru.squad1332.cg.modes.Mode;
+import ru.squad1332.cg.modes.Channel;
+
 import java.io.File;
 
 public interface Picture {
-    int[] getPixelData();
+    Pixel[] getPixelData();
     String getFormatType();
     int getWidth();
     int getHeight();
@@ -11,4 +14,7 @@ public interface Picture {
     String getPath();
     void setPath(String path);
     void writeToFile(File file);
+
+    int[] getIntArgb(Mode mode, Channel channel);
+
 }
