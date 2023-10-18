@@ -2,100 +2,77 @@
 
 <!--        style="-fx-background-color: #9DBDEB;"-->
 
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_CENTER" prefHeight="1000.0" prefWidth="1920.0"
+      xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="ru.squad1332.cg.controller.MainController">
 
-<?import javafx.scene.canvas.Canvas?>
-<?import com.sun.javafx.scene.control.ContextMenuContent.ArrowMenuItem?>
-<VBox alignment="CENTER" prefHeight="1000.0" prefWidth="1920.0" spacing="20.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.squad1332.cg.controller.MainController">
 
-    <padding>
-        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-    </padding>
-
-    <children>
-    <MenuBar fx:id="menu">
-        <menus>
-            <Menu mnemonicParsing="false" text="Файл">
+    <MenuBar fx:id="menu" prefHeight="27.0" prefWidth="1913.0">
+        <Menu mnemonicParsing="false" text="Файл">
+            <MenuItem mnemonicParsing="false" onAction="#onOpen" text="Открыть"/>
+            <MenuItem mnemonicParsing="false" onAction="#onSaveAs" text="Сохранить"/>
+        </Menu>
+        <Menu mnemonicParsing="false" text="Цветовые пространства">
+            <Menu mnemonicParsing="false" text="HSL">
+                <MenuItem mnemonicParsing="false" onAction="#onToHsl" text="hsl"/>
+                <MenuItem mnemonicParsing="false" onAction="#onToHue" text="hue"/>
+                <MenuItem mnemonicParsing="false" onAction="#onToSaturation" text="saturation"/>
+                <MenuItem mnemonicParsing="false" onAction="#onToLightness" text="lightness"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="HSV">
+                <MenuItem mnemonicParsing="false" onAction="#onToHsv" text="hsv"/>
+                <MenuItem mnemonicParsing="false" onAction="#onToHsvHue" text="hue"/>
+                <MenuItem mnemonicParsing="false" onAction="#onToHsvSaturation" text="saturation"/>
+                <MenuItem mnemonicParsing="false" onAction="#onToHsvValue" text="value"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="YCbCr601">
+                <MenuItem mnemonicParsing="false" onAction="#onYCbCr601" text="YCbCr"/>
+                <MenuItem mnemonicParsing="false" onAction="#Y601" text="Y"/>
+                <MenuItem mnemonicParsing="false" onAction="#Cb601" text="Cb"/>
+                <MenuItem mnemonicParsing="false" onAction="#Cr601" text="Cr"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="YCbCr709">
+                <MenuItem mnemonicParsing="false" onAction="#onYCbCr709" text="YCbCr"/>
+                <MenuItem mnemonicParsing="false" onAction="#Y709" text="Y"/>
+                <MenuItem mnemonicParsing="false" onAction="#Cb709" text="Cb"/>
+                <MenuItem mnemonicParsing="false" onAction="#Cr709" text="Cr"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="YCoCg">
+                <MenuItem mnemonicParsing="false" onAction="#onYCoCg" text="YCoCg"/>
+                <MenuItem mnemonicParsing="false" onAction="#onY" text="Y"/>
+                <MenuItem mnemonicParsing="false" onAction="#onCo" text="Co"/>
+                <MenuItem mnemonicParsing="false" onAction="#onCg" text="Cg"/>
+            </Menu>
+            <Menu mnemonicParsing="false" text="CMY">
                 <items>
-                    <MenuItem mnemonicParsing="false" onAction="#onOpen" text="Открыть" />
-                    <MenuItem mnemonicParsing="false" onAction="#onSaveAs" text="Сохранить" />
+                    <MenuItem mnemonicParsing="false" onAction="#onCmy" text="CMY"/>
+                    <MenuItem mnemonicParsing="false" onAction="#onCmyC" text="C"/>
+                    <MenuItem mnemonicParsing="false" onAction="#onCmyM" text="M"/>
+                    <MenuItem mnemonicParsing="false" onAction="#onCmyY" text="Y"/>
                 </items>
             </Menu>
-            <Menu mnemonicParsing="false" text="Цветовые пространства">
+            <Menu mnemonicParsing="false" text="RGB">
                 <items>
-                    <Menu mnemonicParsing="false" text="RGB">
-                        <items>
-                            <MenuItem mnemonicParsing="false" onAction="#onToRgb" text="rgb"/>
-                            <MenuItem mnemonicParsing="false" onAction="#onToRed" text="red"/>
-                            <MenuItem mnemonicParsing="false" onAction="#onToGreen" text="green"/>
-                            <MenuItem mnemonicParsing="false" onAction="#onToBlue" text="blue"/>
-                        </items>
-                    </Menu>
-                </items>
-                <Menu mnemonicParsing="false" text="HSL">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHsl" text="hsl"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHue" text="hue"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToSaturation" text="saturation"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToLightness" text="lightness"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="HSV">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHsv" text="hsv"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHsvHue" text="hue"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHsvSaturation" text="saturation"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHsvValue" text="value"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="YCbCr601">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onYCbCr601" text="YCbCr"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Y601" text="Y"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Cb601" text="Cb"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Cr601" text="Cr"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="YCbCr709">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onYCbCr709" text="YCbCr"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Y709" text="Y"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Cb709" text="Cb"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Cr709" text="Cr"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="YCoCg">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onYCoCg" text="YCoCg"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onY" text="Y"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onCo" text="Co"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onCg" text="Cg"/>
-                    </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="CMY">
-                    <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onCmy" text="CMY"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onCmyC" text="C"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onCmyM" text="M"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onCmyY" text="Y"/>
-                    </items>
-                </Menu>
-            </Menu>
-            <Menu mnemonicParsing="false" text="Help">
-                <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
+                    <MenuItem mnemonicParsing="false" onAction="#onToRgb" text="rgb"/>
+                    <MenuItem mnemonicParsing="false" onAction="#onToRed" text="red"/>
+                    <MenuItem mnemonicParsing="false" onAction="#onToGreen" text="green"/>
+                    <MenuItem mnemonicParsing="false" onAction="#onToBlue" text="blue"/>
                 </items>
             </Menu>
-        </menus>
+        </Menu>
+
+        <Menu mnemonicParsing="false" text="Help">
+            <MenuItem mnemonicParsing="false" text="About"/>
+        </Menu>
     </MenuBar>
-        <Label fx:id="filename" text="Выберите фото" />
-        <ScrollPane>
-            <Canvas fx:id="canvas" height="300.0" width="500.0">
-            </Canvas>
-        </ScrollPane>
-        <Label fx:id="errorMessage" textFill="RED" />
+    <Label fx:id="filename" text="Выберите фото"/>
 
-    </children>
+    <ScrollPane maxHeight="1080" minHeight="150">
+        <ImageView fx:id="imageView" onScroll="#handleScroll" pickOnBounds="true"
+                   preserveRatio="true"/>
+    </ScrollPane>
+    <Label fx:id="errorMessage" textFill="RED"/>
+
 </VBox>

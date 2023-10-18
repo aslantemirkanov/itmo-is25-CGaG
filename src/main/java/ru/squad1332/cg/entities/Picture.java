@@ -13,7 +13,7 @@ public interface Picture {
 
     String getPath();
     void setPath(String path);
-    void writeToFile(File file);
+    void writeToFile(File file, Mode mode, Channel channel);
 
     int[] getIntArgb(Mode mode, Channel channel);
 

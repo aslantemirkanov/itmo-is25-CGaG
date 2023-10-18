@@ -1,23 +1,30 @@
 package ru.squad1332.cg.controller;
 
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
-import javafx.scene.image.PixelFormat;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.*;
+import javafx.scene.input.ScrollEvent;
 import javafx.stage.FileChooser;
 import ru.squad1332.cg.controllers.PictureController;
 import ru.squad1332.cg.entities.Picture;
-import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.modes.Channel;
+import ru.squad1332.cg.modes.Mode;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.IntBuffer;
 
 public class MainController {
+    private static final double scale = 1.05;
+    @FXML
+    private ImageView imageView;
     @FXML
     private MenuBar menu;
     @FXML
@@ -27,22 +34,22 @@ public class MainController {
     @FXML
     private Label errorMessage;
     @FXML
-    private Canvas canvas;
-    @FXML
     private Label filename;
     private File file;
-
     private Picture picture;
+    private Mode mode;
+    private Channel channel;
     private PictureController pictureController = new PictureController();
+    private double zoomFactor = scale;
 
     @FXML
     protected void onOpen(ActionEvent event) {
         try {
             this.errorMessage.setText("");
             FileChooser fileChooser = new FileChooser();
-            this.file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
+            this.file = fileChooser.showOpenDialog(imageView.getScene().getWindow());
             if (this.file != null) {
-                picture = pictureController.openPicture(this.file.getPath());
+                this.picture = pictureController.openPicture(this.file.getPath());
                 draw(picture, Mode.RGB, Channel.ALL);
             }
 
@@ -53,24 +60,20 @@ public class MainController {
     }
 
     private void draw(Picture picture, Mode mode, Channel channel) {
-//                canvas.setScaleX(canvas.getWidth() / picture.getWidth());
-//                canvas.setScaleY(canvas.getHeight() / picture.getHeight());
-        canvas.setWidth(picture.getWidth());
-        canvas.setHeight(picture.getHeight());
-        PixelWriter pixelWriter = canvas.getGraphicsContext2D().getPixelWriter();
-        pixelWriter.setPixels(0, 0,
+        this.mode = mode;
+        this.channel = channel;
+        WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
+        WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
+        image.getPixelWriter().setPixels(0, 0,
                 picture.getWidth(), picture.getHeight(),
-                PixelFormat.getIntArgbPreInstance(), picture.getIntArgb(mode, channel),
+                format, picture.getIntArgb(mode, channel),
                 0, picture.getWidth());
-        canvas.setScaleY(0.2);
-        canvas.setScaleX(0.2);
-
+        imageView.setImage(image);
     }
-
 
     @FXML
     protected void onSaveAs(ActionEvent event) {
-        try {
+       /* try {
             this.errorMessage.setText("");
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Выберите файл");
@@ -81,7 +84,7 @@ public class MainController {
         } catch (Throwable e) {
             System.out.println(e.getMessage());
             this.errorMessage.setText("Не удалось сохранить изображение");
-        }
+        }*/
     }
 
     public void onToRgb() {
@@ -169,13 +172,14 @@ public class MainController {
         draw(this.picture, Mode.YCOCG, Channel.ALL);
     }
 
-    public void onY(){
+    public void onY() {
         draw(this.picture, Mode.YCOCG, Channel.FIRST);
     }
 
     public void onCo() {
         draw(this.picture, Mode.YCOCG, Channel.SECOND);
     }
+
     public void onCg() {
         draw(this.picture, Mode.YCOCG, Channel.THIRD);
     }
@@ -194,5 +198,20 @@ public class MainController {
 
     public void onCmyY() {
         draw(this.picture, Mode.CMY, Channel.THIRD);
+    }
+
+    public void handleScroll(ScrollEvent event) {
+        if (event.isControlDown()) {
+            double deltaY = event.getDeltaY();
+            if (deltaY < 0) {
+                zoomFactor /= scale;
+            } else if (deltaY > 0) {
+                zoomFactor *= scale;
+            }
+            imageView.setScaleX(zoomFactor);
+            imageView.setScaleY(zoomFactor);
+
+            event.consume();
+        }
     }
 }
