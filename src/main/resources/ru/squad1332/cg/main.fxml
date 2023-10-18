@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--        style="-fx-background-color: #9DBDEB;"-->
 
 <?import javafx.geometry.*?>
@@ -27,59 +26,59 @@
                 <items>
                     <Menu mnemonicParsing="false" text="RGB">
                         <items>
-                            <MenuItem mnemonicParsing="false" onAction="#onToRgb" text="rgb"/>
-                            <MenuItem mnemonicParsing="false" onAction="#onToRed" text="red"/>
-                            <MenuItem mnemonicParsing="false" onAction="#onToGreen" text="green"/>
-                            <MenuItem mnemonicParsing="false" onAction="#onToBlue" text="blue"/>
+                            <MenuItem fx:id="onToRgb" mnemonicParsing="false" onAction="#colorConvertor" text="rgb"/>
+                            <MenuItem fx:id="onToRed" mnemonicParsing="false" onAction="#colorConvertor" text="red"/>
+                            <MenuItem fx:id="onToGreen" mnemonicParsing="false" onAction="#colorConvertor" text="green"/>
+                            <MenuItem fx:id="onToBlue" mnemonicParsing="false" onAction="#colorConvertor" text="blue"/>
                         </items>
                     </Menu>
                 </items>
                 <Menu mnemonicParsing="false" text="HSL">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHsl" text="hsl"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHue" text="hue"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToSaturation" text="saturation"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToLightness" text="lightness"/>
+                        <MenuItem fx:id="onToHsl" mnemonicParsing="false" onAction="#colorConvertor" text="hsl"/>
+                        <MenuItem fx:id="onToHue" mnemonicParsing="false" onAction="#colorConvertor" text="hue"/>
+                        <MenuItem fx:id="onToSaturation" mnemonicParsing="false" onAction="#colorConvertor" text="saturation"/>
+                        <MenuItem fx:id="onToLightness" mnemonicParsing="false" onAction="#colorConvertor" text="lightness"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="HSV">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHsv" text="hsv"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHsvHue" text="hue"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHsvSaturation" text="saturation"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onToHsvValue" text="value"/>
+                        <MenuItem fx:id="onToHsv" mnemonicParsing="false" onAction="#colorConvertor" text="hsv"/>
+                        <MenuItem fx:id="onToHsvHue" mnemonicParsing="false" onAction="#colorConvertor" text="hue"/>
+                        <MenuItem fx:id="onToHsvSaturation" mnemonicParsing="false" onAction="#colorConvertor" text="saturation"/>
+                        <MenuItem fx:id="onToHsvValue" mnemonicParsing="false" onAction="#colorConvertor" text="value"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="YCbCr601">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onYCbCr601" text="YCbCr"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Y601" text="Y"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Cb601" text="Cb"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Cr601" text="Cr"/>
+                        <MenuItem fx:id="onYCbCr601" mnemonicParsing="false" onAction="#colorConvertor" text="YCbCr"/>
+                        <MenuItem fx:id="Y601" mnemonicParsing="false" onAction="#colorConvertor" text="Y"/>
+                        <MenuItem fx:id="Cb601" mnemonicParsing="false" onAction="#colorConvertor" text="Cb"/>
+                        <MenuItem fx:id="Cr601" mnemonicParsing="false" onAction="#colorConvertor" text="Cr"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="YCbCr709">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onYCbCr709" text="YCbCr"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Y709" text="Y"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Cb709" text="Cb"/>
-                        <MenuItem mnemonicParsing="false" onAction="#Cr709" text="Cr"/>
+                        <MenuItem fx:id="onYCbCr709" mnemonicParsing="false" onAction="#colorConvertor" text="YCbCr"/>
+                        <MenuItem fx:id="Y709" mnemonicParsing="false" onAction="#colorConvertor" text="Y"/>
+                        <MenuItem fx:id="Cb709" mnemonicParsing="false" onAction="#colorConvertor" text="Cb"/>
+                        <MenuItem fx:id="Cr709" mnemonicParsing="false" onAction="#colorConvertor" text="Cr"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="YCoCg">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onYCoCg" text="YCoCg"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onY" text="Y"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onCo" text="Co"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onCg" text="Cg"/>
+                        <MenuItem fx:id="onYCoCg" mnemonicParsing="false" onAction="#colorConvertor" text="YCoCg"/>
+                        <MenuItem fx:id="onY" mnemonicParsing="false" onAction="#colorConvertor" text="Y"/>
+                        <MenuItem fx:id="onCo" mnemonicParsing="false" onAction="#colorConvertor" text="Co"/>
+                        <MenuItem fx:id="onCg" mnemonicParsing="false" onAction="#colorConvertor" text="Cg"/>
                     </items>
                 </Menu>
                 <Menu mnemonicParsing="false" text="CMY">
                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#onCmy" text="CMY"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onCmyC" text="C"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onCmyM" text="M"/>
-                        <MenuItem mnemonicParsing="false" onAction="#onCmyY" text="Y"/>
+                        <MenuItem fx:id="onCmy" mnemonicParsing="false" onAction="#colorConvertor" text="CMY"/>
+                        <MenuItem fx:id="onCmyC" mnemonicParsing="false" onAction="#colorConvertor" text="C"/>
+                        <MenuItem fx:id="onCmyM" mnemonicParsing="false" onAction="#colorConvertor" text="M"/>
+                        <MenuItem fx:id="onCmyY" mnemonicParsing="false" onAction="#colorConvertor" text="Y"/>
                     </items>
                 </Menu>
             </Menu>

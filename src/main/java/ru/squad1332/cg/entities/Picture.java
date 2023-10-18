@@ -7,13 +7,18 @@ import java.io.File;
 
 public interface Picture {
     Pixel[] getPixelData();
+
     String getFormatType();
+
     int getWidth();
+
     int getHeight();
 
     String getPath();
+
     void setPath(String path);
-    void writeToFile(File file);
+
+    void writeToFile(File file, Mode mode, Channel channel);
 
     int[] getIntArgb(Mode mode, Channel channel);
 

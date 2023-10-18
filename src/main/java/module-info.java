@@ -4,6 +4,7 @@ module ru.squad1332.cg {
 
     requires com.dlsc.formsfx;
     requires org.kordamp.ikonli.javafx;
+    requires org.apache.commons.lang3;
 
     opens ru.squad1332.cg to javafx.fxml;
     exports ru.squad1332.cg;
