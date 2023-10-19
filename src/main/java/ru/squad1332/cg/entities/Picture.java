@@ -7,6 +7,7 @@ import java.io.File;
 
 public interface Picture {
     Pixel[] getPixelData();
+
     String getFormatType();
     int getWidth();
     int getHeight();

@@ -42,6 +42,7 @@ public class ColorConvertor {
             double l = (max + min) / 2;
             double s = d / (1 - Math.abs(1 - (max + min)));
             double h = 0;
+
             if (max == min) {
                 h = 0;
                 s = 0;
@@ -68,16 +69,17 @@ public class ColorConvertor {
                     l = 0.5;
                 }
                 case SECOND -> {
-                    h = 0.5;
+                    h = 0;
                     s = s;
                     l = 0.5;
                 }
                 case THIRD -> {
-                    h = l;
-                    s = l;
+                    h = 200;
+                    s = 0;
                     l = l;
                 }
             }
+
 
             double c = (1.0 - Math.abs(2.0 * l - 1.0)) * s;
             double x = c * (1.0 - Math.abs((h / 60.0) % 2.0 - 1.0));
@@ -164,8 +166,8 @@ public class ColorConvertor {
                     v = 1;
                 }
                 case THIRD -> {
-                    h = v;
-                    s = v;
+                    h = 1;
+                    s = 0;
                     v = v;
                 }
             }

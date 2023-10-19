@@ -11,15 +11,27 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.*;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.control.MenuItem;
+import javafx.scene.image.PixelFormat;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
-import ru.squad1332.cg.controllers.PictureController;
+import ru.squad1332.cg.convertor.ColorConvertor;
 import ru.squad1332.cg.entities.Picture;
+import ru.squad1332.cg.entities.Pixel;
+import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
+import ru.squad1332.cg.services.PictureService;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
+
+import org.apache.commons.lang3.tuple.Pair;
 import java.nio.IntBuffer;
 
 public class MainController {
@@ -34,6 +46,47 @@ public class MainController {
     private ImageView thirdChannel;
     @FXML
     private ImageView imageView;
+
+    private static Map<String, Pair<Mode, Channel>> getMapModeChannel(){
+        Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = new HashMap<>();
+
+        MODE_TO_FUNC.put("onToRgb", Pair.of(Mode.RGB, Channel.ALL));
+        MODE_TO_FUNC.put("onToRed", Pair.of(Mode.RGB, Channel.FIRST));
+        MODE_TO_FUNC.put("onToGreen", Pair.of(Mode.RGB, Channel.SECOND));
+        MODE_TO_FUNC.put("onToBlue", Pair.of(Mode.RGB, Channel.THIRD));
+
+        MODE_TO_FUNC.put("onToHsl", Pair.of(Mode.HSL, Channel.ALL));
+        MODE_TO_FUNC.put("onToHue", Pair.of(Mode.HSL, Channel.FIRST));
+        MODE_TO_FUNC.put("onToSaturation", Pair.of(Mode.HSL, Channel.SECOND));
+        MODE_TO_FUNC.put("onToLightness", Pair.of(Mode.HSL, Channel.THIRD));
+
+        MODE_TO_FUNC.put("onToHsv", Pair.of(Mode.HSV, Channel.ALL));
+        MODE_TO_FUNC.put("onToHsvHue", Pair.of(Mode.HSV, Channel.FIRST));
+        MODE_TO_FUNC.put("onToHsvSaturation", Pair.of(Mode.HSV, Channel.SECOND));
+        MODE_TO_FUNC.put("onToHsvValue", Pair.of(Mode.HSV, Channel.THIRD));
+
+        MODE_TO_FUNC.put("onYCbCr601", Pair.of(Mode.YCBCR601, Channel.ALL));
+        MODE_TO_FUNC.put("Y601", Pair.of(Mode.YCBCR601, Channel.FIRST));
+        MODE_TO_FUNC.put("Cb601", Pair.of(Mode.YCBCR601, Channel.SECOND));
+        MODE_TO_FUNC.put("Cr601", Pair.of(Mode.YCBCR601, Channel.THIRD));
+
+        MODE_TO_FUNC.put("onYCbCr709", Pair.of(Mode.YCBCR709, Channel.ALL));
+        MODE_TO_FUNC.put("Y709", Pair.of(Mode.YCBCR709, Channel.FIRST));
+        MODE_TO_FUNC.put("Cb709", Pair.of(Mode.YCBCR709, Channel.SECOND));
+        MODE_TO_FUNC.put("Cr709", Pair.of(Mode.YCBCR709, Channel.THIRD));
+
+        MODE_TO_FUNC.put("onYCoCg", Pair.of(Mode.YCOCG, Channel.ALL));
+        MODE_TO_FUNC.put("onY", Pair.of(Mode.YCOCG, Channel.FIRST));
+        MODE_TO_FUNC.put("onCo", Pair.of(Mode.YCOCG, Channel.SECOND));
+        MODE_TO_FUNC.put("onCg", Pair.of(Mode.YCOCG, Channel.THIRD));
+
+        MODE_TO_FUNC.put("onCmy", Pair.of(Mode.CMY, Channel.ALL));
+        MODE_TO_FUNC.put("onCmyC", Pair.of(Mode.CMY, Channel.FIRST));
+        MODE_TO_FUNC.put("onCmyM", Pair.of(Mode.CMY, Channel.SECOND));
+        MODE_TO_FUNC.put("onCmyY", Pair.of(Mode.CMY, Channel.THIRD));
+
+        return MODE_TO_FUNC;
+    }
     @FXML
     private MenuBar menu;
     @FXML
@@ -45,10 +98,12 @@ public class MainController {
     @FXML
     private Label filename;
     private File file;
+
+    private PictureService pictureService = new PictureService();
+
     private Picture picture;
-    private Mode mode;
+    private Mode currentMode;
     private Channel channel;
-    private PictureController pictureController = new PictureController();
     private double zoomFactor = scale;
 
     @FXML
@@ -58,7 +113,7 @@ public class MainController {
             FileChooser fileChooser = new FileChooser();
             this.file = fileChooser.showOpenDialog(imageView.getScene().getWindow());
             if (this.file != null) {
-                this.picture = pictureController.openPicture(this.file.getPath());
+                this.picture = pictureService.openPicture(this.file.getPath());
                 draw(picture);
             }
 
@@ -79,7 +134,7 @@ public class MainController {
     }
 
     private void draw(Picture picture, Mode mode, Channel channel) {
-        this.mode = mode;
+        this.currentMode = mode;
         this.channel = channel;
         WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
         WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
@@ -135,131 +190,12 @@ public class MainController {
         }
     }
 
-    public void onToRgb() {
-        draw(this.picture, Mode.RGB);
-    }
 
-    public void onToRed() {
-        draw(this.picture, Mode.RGB, Channel.FIRST);
-    }
-
-    public void onToGreen() {
-        draw(this.picture, Mode.RGB, Channel.SECOND);
-    }
-
-    public void onToBlue() {
-        draw(this.picture, Mode.RGB, Channel.THIRD);
-    }
-
-    public void onToHsl() {
-        draw(this.picture, Mode.HSL);
-    }
-
-    public void onToHue() {
-        draw(this.picture, Mode.HSL, Channel.FIRST);
-    }
-
-    public void onToSaturation() {
-        draw(this.picture, Mode.HSL, Channel.SECOND);
-    }
-
-    public void onToLightness() {
-        draw(this.picture, Mode.HSL, Channel.THIRD);
-    }
-
-    public void onToHsv() {
-        draw(this.picture, Mode.HSV);
-    }
-
-    public void onToHsvHue() {
-        draw(this.picture, Mode.HSV, Channel.FIRST);
-    }
-
-    public void onToHsvSaturation() {
-        draw(this.picture, Mode.HSV, Channel.SECOND);
-    }
-
-    public void onToHsvValue() {
-        draw(this.picture, Mode.HSV, Channel.THIRD);
-    }
-
-    public void onYCbCr601() {
-        draw(this.picture, Mode.YCBCR601);
-    }
-
-    public void Y601() {
-        draw(this.picture, Mode.YCBCR601, Channel.FIRST);
-    }
-
-    public void Cb601() {
-        draw(this.picture, Mode.YCBCR601, Channel.SECOND);
-    }
-
-    public void Cr601() {
-        draw(this.picture, Mode.YCBCR601, Channel.THIRD);
-    }
-
-    public void onYCbCr709() {
-        draw(this.picture, Mode.YCBCR709);
-    }
-
-    public void Y709() {
-        draw(this.picture, Mode.YCBCR709, Channel.FIRST);
-    }
-
-    public void Cb709() {
-        draw(this.picture, Mode.YCBCR709, Channel.SECOND);
-
-    }
-
-    public void Cr709() {
-        draw(this.picture, Mode.YCBCR709, Channel.THIRD);
-    }
-
-    public void onYCoCg() {
-        draw(this.picture, Mode.YCOCG);
-    }
-
-    public void onY() {
-        draw(this.picture, Mode.YCOCG, Channel.FIRST);
-    }
-
-    public void onCo() {
-        draw(this.picture, Mode.YCOCG, Channel.SECOND);
-    }
-
-    public void onCg() {
-        draw(this.picture, Mode.YCOCG, Channel.THIRD);
-    }
-
-    public void onCmy() {
-        draw(this.picture, Mode.CMY);
-    }
-
-    public void onCmyC() {
-        draw(this.picture, Mode.CMY, Channel.FIRST);
-    }
-
-    public void onCmyM() {
-        draw(this.picture, Mode.CMY, Channel.SECOND);
-    }
-
-    public void onCmyY() {
-        draw(this.picture, Mode.CMY, Channel.THIRD);
-    }
-
-    public void handleScroll(ScrollEvent event) {
-        if (event.isControlDown()) {
-            double deltaY = event.getDeltaY();
-            if (deltaY < 0) {
-                zoomFactor /= scale;
-            } else if (deltaY > 0) {
-                zoomFactor *= scale;
-            }
-            imageView.setScaleX(zoomFactor);
-            imageView.setScaleY(zoomFactor);
-
-            event.consume();
-        }
+    @FXML
+    protected void colorConvertor(ActionEvent event) {
+        MenuItem menuItem = (MenuItem) event.getSource();
+        String format = menuItem.getId();
+        Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = getMapModeChannel();
+        draw(this.picture, MODE_TO_FUNC.get(format).getLeft(), MODE_TO_FUNC.get(format).getRight());
     }
 }
