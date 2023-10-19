@@ -1,43 +1,29 @@
 package ru.squad1332.cg.controller;
 
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.image.*;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.*;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelFormat;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.image.WritableImage;
+import javafx.scene.image.WritablePixelFormat;
+import javafx.scene.input.ScrollEvent;
 import javafx.stage.FileChooser;
-import ru.squad1332.cg.convertor.ColorConvertor;
+import org.apache.commons.lang3.tuple.Pair;
 import ru.squad1332.cg.entities.Picture;
-import ru.squad1332.cg.entities.Pixel;
-import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.services.PictureService;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.File;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiFunction;
-
-import org.apache.commons.lang3.tuple.Pair;
-import java.nio.IntBuffer;
 
 public class MainController {
     private static final double scale = 1.05;
     @FXML
-    private  ScrollPane scrollPane;
+    private ScrollPane scrollPane;
     @FXML
     private ImageView firstChannel;
     @FXML
@@ -46,8 +32,24 @@ public class MainController {
     private ImageView thirdChannel;
     @FXML
     private ImageView imageView;
+    @FXML
+    private MenuBar menu;
+    @FXML
+    private Button toRed;
+    @FXML
+    private Button toHSL;
+    @FXML
+    private Label errorMessage;
+    @FXML
+    private Label filename;
+    private File file;
+    private PictureService pictureService = new PictureService();
+    private Picture picture;
+    private Mode mode;
+    private Channel channel;
+    private double zoomFactor = scale;
 
-    private static Map<String, Pair<Mode, Channel>> getMapModeChannel(){
+    private static Map<String, Pair<Mode, Channel>> getMapModeChannel() {
         Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = new HashMap<>();
 
         MODE_TO_FUNC.put("onToRgb", Pair.of(Mode.RGB, Channel.ALL));
@@ -87,24 +89,6 @@ public class MainController {
 
         return MODE_TO_FUNC;
     }
-    @FXML
-    private MenuBar menu;
-    @FXML
-    private Button toRed;
-    @FXML
-    private Button toHSL;
-    @FXML
-    private Label errorMessage;
-    @FXML
-    private Label filename;
-    private File file;
-
-    private PictureService pictureService = new PictureService();
-
-    private Picture picture;
-    private Mode currentMode;
-    private Channel channel;
-    private double zoomFactor = scale;
 
     @FXML
     protected void onOpen(ActionEvent event) {
@@ -113,7 +97,7 @@ public class MainController {
             FileChooser fileChooser = new FileChooser();
             this.file = fileChooser.showOpenDialog(imageView.getScene().getWindow());
             if (this.file != null) {
-                this.picture = pictureService.openPicture(this.file.getPath());
+                this.picture = pictureService.openPicture(this.file.getPath(), this.mode);
                 draw(picture);
             }
 
@@ -134,8 +118,16 @@ public class MainController {
     }
 
     private void draw(Picture picture, Mode mode, Channel channel) {
-        this.currentMode = mode;
+        this.mode = mode;
         this.channel = channel;
+        if (channel.equals(Channel.ALL)) {
+            draw(picture, mode);
+            return;
+        } else {
+            firstChannel.setImage(null);
+            secondChannel.setImage(null);
+            thirdChannel.setImage(null);
+        }
         WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
         WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
         image.getPixelWriter().setPixels(0, 0,
@@ -198,4 +190,20 @@ public class MainController {
         Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = getMapModeChannel();
         draw(this.picture, MODE_TO_FUNC.get(format).getLeft(), MODE_TO_FUNC.get(format).getRight());
     }
+
+    public void handleScroll(ScrollEvent event) {
+        if (event.isControlDown()) {
+            double deltaY = event.getDeltaY();
+            if (deltaY < 0) {
+                zoomFactor /= scale;
+            } else if (deltaY > 0) {
+                zoomFactor *= scale;
+            }
+            imageView.setScaleX(zoomFactor);
+            imageView.setScaleY(zoomFactor);
+
+            event.consume();
+        }
+    }
+
 }

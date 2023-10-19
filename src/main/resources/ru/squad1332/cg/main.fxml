@@ -94,11 +94,11 @@
     </ScrollPane>
 
     <HBox>
-        <ImageView fx:id="firstChannel" fitHeight="150" fitWidth="250" onScroll="#handleScroll" pickOnBounds="true"
+        <ImageView fx:id="firstChannel" fitHeight="150" fitWidth="250"  pickOnBounds="true"
                    preserveRatio="true"/>
-        <ImageView fx:id="secondChannel" fitHeight="150" fitWidth="250" onScroll="#handleScroll" pickOnBounds="true"
+        <ImageView fx:id="secondChannel" fitHeight="150" fitWidth="250"  pickOnBounds="true"
                    preserveRatio="true"/>
-        <ImageView fx:id="thirdChannel" fitHeight="150" fitWidth="250" onScroll="#handleScroll" pickOnBounds="true"
+        <ImageView fx:id="thirdChannel" fitHeight="150" fitWidth="250"  pickOnBounds="true"
                    preserveRatio="true"/>
     </HBox>
 
