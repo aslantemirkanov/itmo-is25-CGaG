@@ -4,7 +4,9 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_CENTER" prefHeight="1000.0" prefWidth="1920.0"
       xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="ru.squad1332.cg.controller.MainController">
 
@@ -15,36 +17,43 @@
             <MenuItem mnemonicParsing="false" onAction="#onSaveAs" text="Сохранить"/>
         </Menu>
         <Menu mnemonicParsing="false" text="Цветовые пространства">
+            <!--            <MenuItem mnemonicParsing="false" onAction="#onToHsl" text="hsl"/>-->
             <Menu mnemonicParsing="false" text="HSL">
                 <MenuItem mnemonicParsing="false" onAction="#onToHsl" text="hsl"/>
                 <MenuItem mnemonicParsing="false" onAction="#onToHue" text="hue"/>
                 <MenuItem mnemonicParsing="false" onAction="#onToSaturation" text="saturation"/>
                 <MenuItem mnemonicParsing="false" onAction="#onToLightness" text="lightness"/>
             </Menu>
+            <!--            <MenuItem mnemonicParsing="false" onAction="#onToHsv" text="hsv"/>-->
             <Menu mnemonicParsing="false" text="HSV">
                 <MenuItem mnemonicParsing="false" onAction="#onToHsv" text="hsv"/>
                 <MenuItem mnemonicParsing="false" onAction="#onToHsvHue" text="hue"/>
                 <MenuItem mnemonicParsing="false" onAction="#onToHsvSaturation" text="saturation"/>
                 <MenuItem mnemonicParsing="false" onAction="#onToHsvValue" text="value"/>
             </Menu>
+            <!--            <MenuItem mnemonicParsing="false" onAction="#onYCbCr601" text="YCbCr"/>-->
+
             <Menu mnemonicParsing="false" text="YCbCr601">
                 <MenuItem mnemonicParsing="false" onAction="#onYCbCr601" text="YCbCr"/>
                 <MenuItem mnemonicParsing="false" onAction="#Y601" text="Y"/>
                 <MenuItem mnemonicParsing="false" onAction="#Cb601" text="Cb"/>
                 <MenuItem mnemonicParsing="false" onAction="#Cr601" text="Cr"/>
             </Menu>
+            <!--            <MenuItem mnemonicParsing="false" onAction="#onYCbCr709" text="YCbCr"/>-->
             <Menu mnemonicParsing="false" text="YCbCr709">
                 <MenuItem mnemonicParsing="false" onAction="#onYCbCr709" text="YCbCr"/>
                 <MenuItem mnemonicParsing="false" onAction="#Y709" text="Y"/>
                 <MenuItem mnemonicParsing="false" onAction="#Cb709" text="Cb"/>
                 <MenuItem mnemonicParsing="false" onAction="#Cr709" text="Cr"/>
             </Menu>
+            <MenuItem mnemonicParsing="false" onAction="#onYCoCg" text="YCoCg"/>
             <Menu mnemonicParsing="false" text="YCoCg">
                 <MenuItem mnemonicParsing="false" onAction="#onYCoCg" text="YCoCg"/>
                 <MenuItem mnemonicParsing="false" onAction="#onY" text="Y"/>
                 <MenuItem mnemonicParsing="false" onAction="#onCo" text="Co"/>
                 <MenuItem mnemonicParsing="false" onAction="#onCg" text="Cg"/>
             </Menu>
+            <!--            <MenuItem mnemonicParsing="false" onAction="#onCmy" text="CMY"/>-->
             <Menu mnemonicParsing="false" text="CMY">
                 <items>
                     <MenuItem mnemonicParsing="false" onAction="#onCmy" text="CMY"/>
@@ -53,6 +62,7 @@
                     <MenuItem mnemonicParsing="false" onAction="#onCmyY" text="Y"/>
                 </items>
             </Menu>
+
             <Menu mnemonicParsing="false" text="RGB">
                 <items>
                     <MenuItem mnemonicParsing="false" onAction="#onToRgb" text="rgb"/>
@@ -69,10 +79,20 @@
     </MenuBar>
     <Label fx:id="filename" text="Выберите фото"/>
 
-    <ScrollPane maxHeight="1080" minHeight="150">
+    <ScrollPane fx:id="scrollPane" maxHeight="1080" minHeight="150">
         <ImageView fx:id="imageView" onScroll="#handleScroll" pickOnBounds="true"
                    preserveRatio="true"/>
     </ScrollPane>
+
+    <HBox>
+        <ImageView fx:id="firstChannel" fitHeight="150" fitWidth="250" onScroll="#handleScroll" pickOnBounds="true"
+                   preserveRatio="true"/>
+        <ImageView fx:id="secondChannel" fitHeight="150" fitWidth="250" onScroll="#handleScroll" pickOnBounds="true"
+                   preserveRatio="true"/>
+        <ImageView fx:id="thirdChannel" fitHeight="150" fitWidth="250" onScroll="#handleScroll" pickOnBounds="true"
+                   preserveRatio="true"/>
+    </HBox>
+
     <Label fx:id="errorMessage" textFill="RED"/>
 
 </VBox>

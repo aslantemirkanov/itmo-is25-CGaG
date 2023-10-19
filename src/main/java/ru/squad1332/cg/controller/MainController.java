@@ -8,6 +8,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.*;
 import javafx.scene.input.ScrollEvent;
 import javafx.stage.FileChooser;
@@ -23,6 +24,14 @@ import java.nio.IntBuffer;
 
 public class MainController {
     private static final double scale = 1.05;
+    @FXML
+    private  ScrollPane scrollPane;
+    @FXML
+    private ImageView firstChannel;
+    @FXML
+    private ImageView secondChannel;
+    @FXML
+    private ImageView thirdChannel;
     @FXML
     private ImageView imageView;
     @FXML
@@ -50,13 +59,23 @@ public class MainController {
             this.file = fileChooser.showOpenDialog(imageView.getScene().getWindow());
             if (this.file != null) {
                 this.picture = pictureController.openPicture(this.file.getPath());
-                draw(picture, Mode.RGB, Channel.ALL);
+                draw(picture);
             }
 
         } catch (Throwable e) {
             System.out.println(e.getMessage());
             this.errorMessage.setText("Не удалось открыть изображение");
         }
+    }
+
+    private void draw(Picture picture) {
+        WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
+        WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
+        image.getPixelWriter().setPixels(0, 0,
+                picture.getWidth(), picture.getHeight(),
+                format, picture.getIntArgb(Mode.RGB, Channel.ALL),
+                0, picture.getWidth());
+        imageView.setImage(image);
     }
 
     private void draw(Picture picture, Mode mode, Channel channel) {
@@ -71,24 +90,53 @@ public class MainController {
         imageView.setImage(image);
     }
 
+    private void draw(Picture picture, Mode mode) {
+        this.mode = mode;
+        WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
+        WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
+        image.getPixelWriter().setPixels(0, 0,
+                picture.getWidth(), picture.getHeight(),
+                format, picture.getIntArgb(mode, Channel.ALL),
+                0, picture.getWidth());
+        imageView.setImage(image);
+        WritableImage imageFirst = new WritableImage(picture.getWidth(), picture.getHeight());
+        imageFirst.getPixelWriter().setPixels(0, 0,
+                picture.getWidth(), picture.getHeight(),
+                format, picture.getIntArgb(mode, Channel.FIRST),
+                0, picture.getWidth());
+        firstChannel.setImage(imageFirst);
+        WritableImage imageSecond = new WritableImage(picture.getWidth(), picture.getHeight());
+        imageSecond.getPixelWriter().setPixels(0, 0,
+                picture.getWidth(), picture.getHeight(),
+                format, picture.getIntArgb(mode, Channel.SECOND),
+                0, picture.getWidth());
+        secondChannel.setImage(imageSecond);
+        WritableImage imageThird = new WritableImage(picture.getWidth(), picture.getHeight());
+        imageThird.getPixelWriter().setPixels(0, 0,
+                picture.getWidth(), picture.getHeight(),
+                format, picture.getIntArgb(mode, Channel.THIRD),
+                0, picture.getWidth());
+        thirdChannel.setImage(imageThird);
+    }
+
     @FXML
     protected void onSaveAs(ActionEvent event) {
-       /* try {
+        try {
             this.errorMessage.setText("");
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Выберите файл");
-            File selectedFile = fileChooser.showSaveDialog(canvas.getScene().getWindow());
+            File selectedFile = fileChooser.showSaveDialog(imageView.getScene().getWindow());
             if (selectedFile != null) {
-                picture.writeToFile(selectedFile);
+                picture.writeToFile(selectedFile, this.mode, this.channel);
             }
         } catch (Throwable e) {
             System.out.println(e.getMessage());
             this.errorMessage.setText("Не удалось сохранить изображение");
-        }*/
+        }
     }
 
     public void onToRgb() {
-        draw(this.picture, Mode.RGB, Channel.ALL);
+        draw(this.picture, Mode.RGB);
     }
 
     public void onToRed() {
@@ -104,7 +152,7 @@ public class MainController {
     }
 
     public void onToHsl() {
-        draw(this.picture, Mode.HSL, Channel.ALL);
+        draw(this.picture, Mode.HSL);
     }
 
     public void onToHue() {
@@ -120,7 +168,7 @@ public class MainController {
     }
 
     public void onToHsv() {
-        draw(this.picture, Mode.HSV, Channel.ALL);
+        draw(this.picture, Mode.HSV);
     }
 
     public void onToHsvHue() {
@@ -136,7 +184,7 @@ public class MainController {
     }
 
     public void onYCbCr601() {
-        draw(this.picture, Mode.YCBCR601, Channel.ALL);
+        draw(this.picture, Mode.YCBCR601);
     }
 
     public void Y601() {
@@ -152,7 +200,7 @@ public class MainController {
     }
 
     public void onYCbCr709() {
-        draw(this.picture, Mode.YCBCR709, Channel.ALL);
+        draw(this.picture, Mode.YCBCR709);
     }
 
     public void Y709() {
@@ -169,7 +217,7 @@ public class MainController {
     }
 
     public void onYCoCg() {
-        draw(this.picture, Mode.YCOCG, Channel.ALL);
+        draw(this.picture, Mode.YCOCG);
     }
 
     public void onY() {
@@ -185,7 +233,7 @@ public class MainController {
     }
 
     public void onCmy() {
-        draw(this.picture, Mode.CMY, Channel.ALL);
+        draw(this.picture, Mode.CMY);
     }
 
     public void onCmyC() {
