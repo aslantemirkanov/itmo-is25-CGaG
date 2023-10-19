@@ -59,61 +59,64 @@ public class ColorConvertor {
 
             switch (channel) {
                 case ALL -> {
-                    h = h;
-                    s = s;
-                    l = l;
+                    h = h / 360 + s + l;
+                    s = h;
+                    l = h;
                 }
                 case FIRST -> {
-                    h = h;
-                    s = 0.5;
-                    l = 0.5;
+                    h = h / 360;
+                    s = h;
+                    l = h;
                 }
                 case SECOND -> {
-                    h = 0;
+                    h = s;
                     s = s;
-                    l = 0.5;
+                    l = s;
                 }
                 case THIRD -> {
-                    h = 200;
-                    s = 0;
+                    h = l;
+                    s = l;
                     l = l;
                 }
             }
 
 
-            double c = (1.0 - Math.abs(2.0 * l - 1.0)) * s;
-            double x = c * (1.0 - Math.abs((h / 60.0) % 2.0 - 1.0));
-            double m = l - c / 2.0;
-
-            if (h >= 0 && h < 60) {
-                r = c;
-                g = x;
-                b = 0;
-            } else if (h >= 60 && h < 120) {
-                r = x;
-                g = c;
-                b = 0;
-            } else if (h >= 120 && h < 180) {
-                r = 0;
-                g = c;
-                b = x;
-            } else if (h >= 180 && h < 240) {
-                r = 0;
-                g = x;
-                b = c;
-            } else if (h >= 240 && h < 300) {
-                r = x;
-                g = 0;
-                b = c;
-            } else {
-                r = c;
-                g = 0;
-                b = x;
-            }
-
-            int red = (int) ((r + m) * 255);
-            int green = (int) ((g + m) * 255);
-            int blue = (int) ((b + m) * 255);
+//            double c = (1.0 - Math.abs(2.0 * l - 1.0)) * s;
+//            double x = c * (1.0 - Math.abs((h / 60.0) % 2.0 - 1.0));
+//            double m = l - c / 2.0;
+//
+//            if (h >= 0 && h < 60) {
+//                r = c;
+//                g = x;
+//                b = 0;
+//            } else if (h >= 60 && h < 120) {
+//                r = x;
+//                g = c;
+//                b = 0;
+//            } else if (h >= 120 && h < 180) {
+//                r = 0;
+//                g = c;
+//                b = x;
+//            } else if (h >= 180 && h < 240) {
+//                r = 0;
+//                g = x;
+//                b = c;
+//            } else if (h >= 240 && h < 300) {
+//                r = x;
+//                g = 0;
+//                b = c;
+//            } else {
+//                r = c;
+//                g = 0;
+//                b = x;
+//            }
+//
+//            int red = (int) ((r + m) * 255);
+//            int green = (int) ((g + m) * 255);
+//            int blue = (int) ((b + m) * 255);
+            int red = (int) (h * 255);
+            int green = (int) (s * 255);
+            int blue = (int) (l * 255);
             int alpha = 255;
             rgba[i] = (alpha << 24) + (red << 16) + (green << 8) + (blue);
         }
@@ -156,58 +159,61 @@ public class ColorConvertor {
                     v = v;
                 }
                 case FIRST -> {
-                    h = h;
-                    s = 1;
-                    v = 1;
+                    h = h / 360;
+                    s = h;
+                    v = h;
                 }
                 case SECOND -> {
-                    h = 1;
+                    h = s;
                     s = s;
-                    v = 1;
+                    v = s;
                 }
                 case THIRD -> {
-                    h = 1;
-                    s = 0;
+                    h = v;
+                    s = v;
                     v = v;
                 }
             }
 
 
-            double c = v * s;
-            double x = c * (1 - Math.abs((h / 60) % 2 - 1));
-            double m = v - c;
-
-            double r1, g1, b1;
-
-            if (0 <= h && h < 60) {
-                r1 = c;
-                g1 = x;
-                b1 = 0;
-            } else if (60 <= h && h < 120) {
-                r1 = x;
-                g1 = c;
-                b1 = 0;
-            } else if (120 <= h && h < 180) {
-                r1 = 0;
-                g1 = c;
-                b1 = x;
-            } else if (180 <= h && h < 240) {
-                r1 = 0;
-                g1 = x;
-                b1 = c;
-            } else if (240 <= h && h < 300) {
-                r1 = x;
-                g1 = 0;
-                b1 = c;
-            } else {
-                r1 = c;
-                g1 = 0;
-                b1 = x;
-            }
-
-            int red = (int) ((r1 + m) * 255);
-            int green = (int) ((g1 + m) * 255);
-            int blue = (int) ((b1 + m) * 255);
+//            double c = v * s;
+//            double x = c * (1 - Math.abs((h / 60) % 2 - 1));
+//            double m = v - c;
+//
+//            double r1, g1, b1;
+//
+//            if (0 <= h && h < 60) {
+//                r1 = c;
+//                g1 = x;
+//                b1 = 0;
+//            } else if (60 <= h && h < 120) {
+//                r1 = x;
+//                g1 = c;
+//                b1 = 0;
+//            } else if (120 <= h && h < 180) {
+//                r1 = 0;
+//                g1 = c;
+//                b1 = x;
+//            } else if (180 <= h && h < 240) {
+//                r1 = 0;
+//                g1 = x;
+//                b1 = c;
+//            } else if (240 <= h && h < 300) {
+//                r1 = x;
+//                g1 = 0;
+//                b1 = c;
+//            } else {
+//                r1 = c;
+//                g1 = 0;
+//                b1 = x;
+//            }
+//
+//            int red = (int) ((r1 + m) * 255);
+//            int green = (int) ((g1 + m) * 255);
+//            int blue = (int) ((b1 + m) * 255);
+            int red = (int) (h * 255);
+            int green = (int) (s * 255);
+            int blue = (int) (v * 255);
             int alpha = 255;
             rgba[i] = (alpha << 24) + (red << 16) + (green << 8) + (blue);
         }
@@ -325,12 +331,12 @@ public class ColorConvertor {
                     cg = 0;
                 }
                 case SECOND -> {
-                    y = 0;
-                    co = co;
+                    y = y;
+                    co = co >= 0 ? co : co + 1;
                     cg = 0;
                 }
                 case THIRD -> {
-                    y = 0;
+                    y = y;
                     co = 0;
                     cg = cg;
                 }
