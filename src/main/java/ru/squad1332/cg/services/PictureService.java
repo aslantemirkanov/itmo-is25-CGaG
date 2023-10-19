@@ -2,6 +2,7 @@ package ru.squad1332.cg.services;
 
 import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;
+import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.parsers.Parser;
 import ru.squad1332.cg.parsers.ParserPNM;
@@ -22,10 +23,12 @@ public class PictureService {
         }
     }
 
-    public PicturePNM openPicture(String filePath, Mode mode) throws IOException {
+    public PicturePNM openPicture(String filePath, Mode mode, Channel channel) throws IOException {
         try {
             getType(filePath);
-            return parser.parse(filePath);
+            PicturePNM picture = parser.parse(filePath);
+            picture.setRgb(mode, channel);
+            return picture;
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }

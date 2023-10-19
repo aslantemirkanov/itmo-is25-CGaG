@@ -5,11 +5,11 @@ import java.util.Arrays;
 public class Pixel {
     private double[] rgba;
 
-    public Pixel(double red, double green, double blue, double alpha) {
-        this.rgba = new double[]{red, green, blue, alpha};
+    public Pixel(double first, double second, double third, double alpha) {
+        this.rgba = new double[]{first, second, third, alpha};
     }
 
-    public double[] getRgba() {
+    public double[] getColors() {
         return rgba;
     }
 
@@ -24,15 +24,15 @@ public class Pixel {
         this.rgba = rgba;
     }
 
-    public double getRed() {
+    public double getFirst() {
         return rgba[0];
     }
 
-    public double getGreen() {
+    public double getSecond() {
         return rgba[1];
     }
 
-    public double getBlue() {
+    public double getThird() {
         return rgba[2];
     }
 

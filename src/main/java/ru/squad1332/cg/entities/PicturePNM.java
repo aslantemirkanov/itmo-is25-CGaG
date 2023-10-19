@@ -2,8 +2,8 @@ package ru.squad1332.cg.entities;
 
 
 import ru.squad1332.cg.convertor.ColorConvertor;
-import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.modes.Channel;
+import ru.squad1332.cg.modes.Mode;
 
 import java.io.DataOutputStream;
 import java.io.File;
@@ -14,15 +14,24 @@ import java.util.function.BiFunction;
 
 public class PicturePNM implements Picture {
 
+    private static final Map<Mode, BiFunction<Pixel[], Channel, Pixel[]>> RGB_TO_OTHER = Map.of(
+            Mode.RGB, ColorConvertor::convertRgbToRgb,
+            Mode.HSL, ColorConvertor::convertRgbToHsl,
+            Mode.HSV, ColorConvertor::convertRgbToHsv,
+            Mode.YCBCR601, ColorConvertor::convertRgbToYCbCr601,
+            Mode.YCBCR709, ColorConvertor::convertRgbToYCbCr709,
+            Mode.YCOCG, ColorConvertor::convertRgbToYCoCg,
+            Mode.CMY, ColorConvertor::convertRgbToCmy
+    );
 
-    private static final Map<Mode, BiFunction<Pixel[], Channel, int[]>> MODE_TO_FUNC = Map.of(
-            Mode.RGB, ColorConvertor::convertToRgb,
-            Mode.HSL, ColorConvertor::convertToHSL,
-            Mode.HSV, ColorConvertor::convertToHSV,
-            Mode.YCBCR601, ColorConvertor::convertToYCbCr601,
-            Mode.YCBCR709, ColorConvertor::convertToYCbCr709,
-            Mode.YCOCG, ColorConvertor::convertToYCoCg,
-            Mode.CMY, ColorConvertor::convertToCmy
+    private static final Map<Mode, BiFunction<Pixel[], Channel, Pixel[]>> OTHER_TO_RGB = Map.of(
+            Mode.RGB, ColorConvertor::convertRgbToRgb,
+            Mode.HSL, ColorConvertor::convertHslToRgb,
+            Mode.HSV, ColorConvertor::convertRgbToHsv,
+            Mode.YCBCR601, ColorConvertor::convertYCbCr601ToRgb,
+            Mode.YCBCR709, ColorConvertor::convertYCbCr709ToRgb,
+            Mode.YCOCG, ColorConvertor::convertYCoCgToRgb,
+            Mode.CMY, ColorConvertor::convertCmyToRgb
     );
     private String formatType;
     private int width;
@@ -30,6 +39,9 @@ public class PicturePNM implements Picture {
     private int maxColorValue;
     private String path;
     private Pixel[] pixelData;
+    private Pixel[] rgb;
+    private Mode mode = Mode.RGB;
+    private Channel channel = Channel.ALL;
 
 
     public String getFormatType() {
@@ -97,14 +109,14 @@ public class PicturePNM implements Picture {
                 for (int i = 0; i < pixelData.length; i++) {
                     cur = i * 3;
                     Pixel curPixel = pixelData[i];
-                    int alpha = (int) (curPixel.getAlpha()* 255);
-                    int[] convert = ColorConvertor.convertRgb(curPixel, mode, channel);
-                    int red = convert[0];
-                    int green = convert[1];
-                    int blue = convert[2];
-                    pixels[cur] = (byte) (red > 127 ? red - 256 : red);
-                    pixels[cur + 1] = (byte) (green > 127 ? green - 256 : green);
-                    pixels[cur + 2] = (byte) (blue > 127 ? blue - 256 : blue);
+                    int alpha = (int) (curPixel.getAlpha() * 255);
+                    double[] convert = curPixel.getColors();
+                    int first = (int) (convert[0] * 255);
+                    int second = (int) (convert[1] * 255);
+                    int third = (int) (convert[2] * 255);
+                    pixels[cur] = (byte) (first > 127 ? first - 256 : first);
+                    pixels[cur + 1] = (byte) (second > 127 ? second - 256 : second);
+                    pixels[cur + 2] = (byte) (third > 127 ? third - 256 : third);
                 }
                 dataOutputStream.write(pixels);
                 dataOutputStream.close();
@@ -113,8 +125,8 @@ public class PicturePNM implements Picture {
             if (formatType.equals("P5")) {
                 byte[] pixels = new byte[height * width];
                 for (int i = 0; i < pixelData.length; i++) {
-                    int red = (int) (pixelData[i].getRgba()[0] * 255);
-                    pixels[i] = (byte) (red > 127 ? red - 256 : red);
+                    int first = (int) (pixelData[i].getColors()[0] * 255);
+                    pixels[i] = (byte) (first > 127 ? first - 256 : first);
                 }
                 dataOutputStream.write(pixels);
             }
@@ -125,7 +137,50 @@ public class PicturePNM implements Picture {
     }
 
     @Override
-    public int[] getIntArgb(Mode mode, Channel channel) {
-        return MODE_TO_FUNC.get(mode).apply(this.pixelData, channel);
+    public int[] getIntArgb() {
+        int[] intRgba = new int[rgb.length];
+        for (int i = 0; i < rgb.length; i++) {
+            double[] rgba = pixelData[i].getColors();
+            int r = (int) (rgba[0] * 255);
+            int g = (int) (rgba[1] * 255);
+            int bl = (int) (rgba[2] * 255);
+            int alpha = (int) (rgba[3] * 255);
+            intRgba[i] = (alpha << 24) + (r << 16) + (g << 8) + (bl);
+        }
+        return intRgba;
+    }
+
+    @Override
+    public void convert(Mode mode, Channel channel) {
+        if (this.mode.equals(mode) && this.channel.equals(channel)) {
+            return;
+        }
+        this.pixelData = RGB_TO_OTHER.get(mode).apply(this.rgb, channel);
+        this.mode = mode;
+        this.channel = channel;
+    }
+
+    @Override
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
+
+    @Override
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    @Override
+    public void setRgb(Mode mode, Channel channel) {
+        System.out.println("RGB set " + mode + " " + channel);
+        this.rgb = OTHER_TO_RGB.get(mode).apply(this.pixelData, channel);
+    }
+
+    public Pixel[] getRgb() {
+        return rgb;
+    }
+
+    public void setRgb(Pixel[] rgb) {
+        this.rgb = rgb;
     }
 }

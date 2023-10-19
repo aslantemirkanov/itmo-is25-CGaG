@@ -45,8 +45,8 @@ public class MainController {
     private File file;
     private PictureService pictureService = new PictureService();
     private Picture picture;
-    private Mode mode;
-    private Channel channel;
+    private Mode mode = Mode.RGB;
+    private Channel channel = Channel.ALL;
     private double zoomFactor = scale;
 
     private static Map<String, Pair<Mode, Channel>> getMapModeChannel() {
@@ -93,33 +93,29 @@ public class MainController {
     @FXML
     protected void onOpen(ActionEvent event) {
         try {
-            this.errorMessage.setText("");
+            System.out.println("Open " + this.mode + " " + this.channel);
+            this.clean();
             FileChooser fileChooser = new FileChooser();
             this.file = fileChooser.showOpenDialog(imageView.getScene().getWindow());
             if (this.file != null) {
-                this.picture = pictureService.openPicture(this.file.getPath(), this.mode);
+                this.picture = pictureService.openPicture(this.file.getPath(), this.mode, this.channel);
                 draw(picture);
             }
 
         } catch (Throwable e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace();
             this.errorMessage.setText("Не удалось открыть изображение");
         }
     }
 
     private void draw(Picture picture) {
-        WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
-        WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
-        image.getPixelWriter().setPixels(0, 0,
-                picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(Mode.RGB, Channel.ALL),
-                0, picture.getWidth());
-        imageView.setImage(image);
+        writeOnImageView(imageView);
     }
 
     private void draw(Picture picture, Mode mode, Channel channel) {
         this.mode = mode;
         this.channel = channel;
+        picture.convert(mode, channel);
         if (channel.equals(Channel.ALL)) {
             draw(picture, mode);
             return;
@@ -128,47 +124,35 @@ public class MainController {
             secondChannel.setImage(null);
             thirdChannel.setImage(null);
         }
-        WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
-        WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
-        image.getPixelWriter().setPixels(0, 0,
-                picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(mode, channel),
-                0, picture.getWidth());
-        imageView.setImage(image);
+        writeOnImageView(imageView);
     }
 
     private void draw(Picture picture, Mode mode) {
         this.mode = mode;
+        picture.convert(mode, Channel.FIRST);
+        writeOnImageView(firstChannel);
+        picture.convert(mode, Channel.SECOND);
+        writeOnImageView(secondChannel);
+        picture.convert(mode, Channel.THIRD);
+        writeOnImageView(thirdChannel);
+        picture.convert(mode, Channel.ALL);
+        writeOnImageView(imageView);
+    }
+
+    private void writeOnImageView(ImageView view) {
         WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
         WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
         image.getPixelWriter().setPixels(0, 0,
                 picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(mode, Channel.ALL),
+                format, picture.getIntArgb(),
                 0, picture.getWidth());
-        imageView.setImage(image);
-        WritableImage imageFirst = new WritableImage(picture.getWidth(), picture.getHeight());
-        imageFirst.getPixelWriter().setPixels(0, 0,
-                picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(mode, Channel.FIRST),
-                0, picture.getWidth());
-        firstChannel.setImage(imageFirst);
-        WritableImage imageSecond = new WritableImage(picture.getWidth(), picture.getHeight());
-        imageSecond.getPixelWriter().setPixels(0, 0,
-                picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(mode, Channel.SECOND),
-                0, picture.getWidth());
-        secondChannel.setImage(imageSecond);
-        WritableImage imageThird = new WritableImage(picture.getWidth(), picture.getHeight());
-        imageThird.getPixelWriter().setPixels(0, 0,
-                picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(mode, Channel.THIRD),
-                0, picture.getWidth());
-        thirdChannel.setImage(imageThird);
+        view.setImage(image);
     }
 
     @FXML
     protected void onSaveAs(ActionEvent event) {
         try {
+            System.out.println("Save " + this.mode + " " + this.channel);
             this.errorMessage.setText("");
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Выберите файл");
@@ -204,6 +188,13 @@ public class MainController {
 
             event.consume();
         }
+    }
+
+    private void clean() {
+        this.errorMessage.setText("");
+        firstChannel.setImage(null);
+        secondChannel.setImage(null);
+        thirdChannel.setImage(null);
     }
 
 }
