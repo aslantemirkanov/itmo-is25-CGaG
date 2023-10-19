@@ -5,8 +5,8 @@ import java.util.Arrays;
 public class Pixel {
     private double[] rgba;
 
-    public Pixel(double first, double second, double third, double alpha) {
-        this.rgba = new double[]{first, second, third, alpha};
+    public Pixel(double first, double second, double third) {
+        this.rgba = new double[]{first, second, third};
     }
 
     public double[] getColors() {
@@ -14,7 +14,7 @@ public class Pixel {
     }
 
     public void setRgb(double[] rgba) {
-        if (rgba.length != 4) {
+        if (rgba.length != 3) {
             for (double i : rgba) {
                 if (i < 0 || i > 1) {
                     throw new IllegalArgumentException("Expected array of rgba, but get: " + Arrays.toString(rgba));
@@ -36,7 +36,4 @@ public class Pixel {
         return rgba[2];
     }
 
-    public double getAlpha() {
-        return rgba[3];
-    }
 }

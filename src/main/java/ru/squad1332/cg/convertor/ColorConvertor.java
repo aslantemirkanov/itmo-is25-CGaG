@@ -22,9 +22,13 @@ public class ColorConvertor {
             double r = color.getFirst();
             double g = color.getSecond();
             double b = color.getThird();
-            result[i] = new Pixel(pos[0] * r, pos[1] * g, pos[2] * b, color.getAlpha());
+            result[i] = new Pixel(pos[0] * r, pos[1] * g, pos[2] * b);
         }
         return result;
+    }
+
+    public static Pixel convertRgbToRgbOne(Pixel pixel) {
+        return pixel;
     }
 
     public static Pixel[] convertRgbToHsl(Pixel[] pixelData, Channel channel) {
@@ -80,7 +84,7 @@ public class ColorConvertor {
                 }
             }
 
-            Pixel pixel = new Pixel(h, s, l, 1);
+            Pixel pixel = new Pixel(h / 360, s, l);
             result[i] = pixel;
         }
 
@@ -91,44 +95,48 @@ public class ColorConvertor {
         Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
-            double h = color.getFirst() * 360;
-            double s = color.getSecond();
-            double l = color.getThird();
-
-            double c = (1.0 - Math.abs(2.0 * l - 1.0)) * s;
-            double x = c * (1.0 - Math.abs((h / 60.0) % 2.0 - 1.0));
-            double m = l - c / 2.0;
-
-            double r, g, b;
-            if (h >= 0 && h < 60) {
-                r = c;
-                g = x;
-                b = 0;
-            } else if (h >= 60 && h < 120) {
-                r = x;
-                g = c;
-                b = 0;
-            } else if (h >= 120 && h < 180) {
-                r = 0;
-                g = c;
-                b = x;
-            } else if (h >= 180 && h < 240) {
-                r = 0;
-                g = x;
-                b = c;
-            } else if (h >= 240 && h < 300) {
-                r = x;
-                g = 0;
-                b = c;
-            } else {
-                r = c;
-                g = 0;
-                b = x;
-            }
-            result[i] = new Pixel(r + m, g + m, b + m, color.getAlpha());
+            result[i] = convertHslToRgbOne(color);
         }
 
         return result;
+    }
+
+    public static Pixel convertHslToRgbOne(Pixel pixel) {
+        double h = pixel.getFirst() * 360;
+        double s = pixel.getSecond();
+        double l = pixel.getThird();
+
+        double c = (1.0 - Math.abs(2.0 * l - 1.0)) * s;
+        double x = c * (1.0 - Math.abs((h / 60.0) % 2.0 - 1.0));
+        double m = l - c / 2.0;
+
+        double r, g, b;
+        if (h >= 0 && h < 60) {
+            r = c;
+            g = x;
+            b = 0;
+        } else if (h >= 60 && h < 120) {
+            r = x;
+            g = c;
+            b = 0;
+        } else if (h >= 120 && h < 180) {
+            r = 0;
+            g = c;
+            b = x;
+        } else if (h >= 180 && h < 240) {
+            r = 0;
+            g = x;
+            b = c;
+        } else if (h >= 240 && h < 300) {
+            r = x;
+            g = 0;
+            b = c;
+        } else {
+            r = c;
+            g = 0;
+            b = x;
+        }
+        return new Pixel(r + m, g + m, b + m);
     }
 
     public static Pixel[] convertRgbToHsv(Pixel[] pixelData, Channel channel) {
@@ -183,7 +191,7 @@ public class ColorConvertor {
             }
 
 
-            Pixel pixel = new Pixel(h, s, v, 1);
+            Pixel pixel = new Pixel(h / 360, s, v);
             result[i] = pixel;
         }
 
@@ -195,52 +203,58 @@ public class ColorConvertor {
         Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
-            double h = color.getFirst() * 360;
-            double s = color.getSecond();
-            double v = color.getThird();
 
-            double c = v * s;
-            double x = c * (1 - Math.abs((h / 60) % 2 - 1));
-            double m = v - c;
-
-            double r, g, b;
-
-            if (0 <= h && h < 60) {
-                r = c;
-                g = x;
-                b = 0;
-            } else if (60 <= h && h < 120) {
-                r = x;
-                g = c;
-                b = 0;
-            } else if (120 <= h && h < 180) {
-                r = 0;
-                g = c;
-                b = x;
-            } else if (180 <= h && h < 240) {
-                r = 0;
-                g = x;
-                b = c;
-            } else if (240 <= h && h < 300) {
-                r = x;
-                g = 0;
-                b = c;
-            } else {
-                r = c;
-                g = 0;
-                b = x;
-            }
-
-            result[i] = new Pixel(r + m, g + m, b + m, color.getAlpha());
+            result[i] = convertHsvToRgbOne(color);
         }
 
         return result;
+    }
+
+    public static Pixel convertHsvToRgbOne(Pixel pixel) {
+        double h = pixel.getFirst() * 360;
+        double s = pixel.getSecond();
+        double v = pixel.getThird();
+
+        double c = v * s;
+        double x = c * (1 - Math.abs((h / 60) % 2 - 1));
+        double m = v - c;
+
+        double r, g, b;
+
+        if (0 <= h && h < 60) {
+            r = c;
+            g = x;
+            b = 0;
+        } else if (60 <= h && h < 120) {
+            r = x;
+            g = c;
+            b = 0;
+        } else if (120 <= h && h < 180) {
+            r = 0;
+            g = c;
+            b = x;
+        } else if (180 <= h && h < 240) {
+            r = 0;
+            g = x;
+            b = c;
+        } else if (240 <= h && h < 300) {
+            r = x;
+            g = 0;
+            b = c;
+        } else {
+            r = c;
+            g = 0;
+            b = x;
+        }
+
+        return new Pixel(r + m, g + m, b + m);
     }
 
 
     public static Pixel[] convertYCbCr601ToRgb(Pixel[] pixelData, Channel channel) {
         return convertYCbCrToRgb(pixelData, channel, YCbCrFormat.YCBCR601);
     }
+
 
     public static Pixel[] convertYCbCr709ToRgb(Pixel[] pixelData, Channel channel) {
         return convertYCbCrToRgb(pixelData, channel, YCbCrFormat.YCBCR709);
@@ -254,46 +268,58 @@ public class ColorConvertor {
         return convertRgbToYCbCr(pixelData, channel, YCbCrFormat.YCBCR709);
     }
 
-    private static Pixel[] convertRgbToYCbCr(Pixel[] pixelData, Channel channel, YCbCrFormat format) {
+    public static Pixel convertYCbCr601ToRgbOne(Pixel pixel) {
+        return convertYCbCrToRgbOne(pixel, YCbCrFormat.YCBCR601);
+    }
+
+    public static Pixel convertYCbCr709ToRgbOne(Pixel pixel) {
+        return convertYCbCrToRgbOne(pixel, YCbCrFormat.YCBCR709);
+    }
+
+    public static Pixel convertYCbCrToRgbOne(Pixel pixel, YCbCrFormat format) {
+        double y = pixel.getFirst() * 255;
+        double cb = pixel.getSecond() * 255;
+        double cr = pixel.getThird() * 255;
+
+        double yd = y;
+        double cbd = cb - 128;
+        double crd = cr - 128;
+
+        int red = 0;
+        int green = 0;
+        int blue = 0;
+
+        switch (format) {
+            case YCBCR601 -> {
+                red = (int) Math.round(yd + 1.402 * crd);
+                green = (int) Math.round(yd - 0.3441 * cbd - 0.7141 * crd);
+                blue = (int) Math.round(yd + 1.772 * cbd);
+            }
+            case YCBCR709 -> {
+                red = (int) Math.round(yd + 1.5748 * crd);
+                green = (int) Math.round(yd - 0.1873 * cbd - 0.4681 * crd);
+                blue = (int) Math.round(yd + 1.8556 * cbd);
+            }
+        }
+
+
+        red = Math.min(255, Math.max(0, red));
+        green = Math.min(255, Math.max(0, green));
+        blue = Math.min(255, Math.max(0, blue));
+
+        return new Pixel((double) red / 255, (double) green / 255, (double) blue / 255);
+    }
+
+    private static Pixel[] convertYCbCrToRgb(Pixel[] pixelData, Channel channel, YCbCrFormat format) {
         Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
-            double y = color.getFirst() * 255;
-            double cb = color.getSecond() * 255;
-            double cr = color.getThird() * 255;
-
-            double yd = y;
-            double cbd = cb - 128;
-            double crd = cr - 128;
-
-            int red = 0;
-            int green = 0;
-            int blue = 0;
-
-            switch (format) {
-                case YCBCR601 -> {
-                    red = (int) Math.round(yd + 1.402 * crd);
-                    green = (int) Math.round(yd - 0.3441 * cbd - 0.7141 * crd);
-                    blue = (int) Math.round(yd + 1.772 * cbd);
-                }
-                case YCBCR709 -> {
-                    red = (int) Math.round(yd + 1.5748 * crd);
-                    green = (int) Math.round(yd - 0.1873 * cbd - 0.4681 * crd);
-                    blue = (int) Math.round(yd + 1.8556 * cbd);
-                }
-            }
-
-
-            red = Math.min(255, Math.max(0, red));
-            green = Math.min(255, Math.max(0, green));
-            blue = Math.min(255, Math.max(0, blue));
-
-            result[i] = new Pixel((double) red / 255, (double) green / 255, (double) blue / 255, color.getAlpha());
+            result[i] = convertYCbCrToRgbOne(color, format);
         }
         return result;
     }
 
-    private static Pixel[] convertYCbCrToRgb(Pixel[] pixelData, Channel channel, YCbCrFormat format) {
+    private static Pixel[] convertRgbToYCbCr(Pixel[] pixelData, Channel channel, YCbCrFormat format) {
         Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
@@ -341,20 +367,24 @@ public class ColorConvertor {
             }
 
 
-            result[i] = new Pixel(y / 255, cb / 255, cr / 255, color.getAlpha());
+            result[i] = new Pixel(y / 255, cb / 255, cr / 255);
         }
         return result;
+    }
+
+    public static Pixel convertYCoCgToRgbOne(Pixel pixel) {
+        double y = pixel.getFirst();
+        double co = pixel.getSecond();
+        double cg = pixel.getThird();
+
+        return new Pixel(y + co - cg, y + cg, y - co - cg);
     }
 
     public static Pixel[] convertYCoCgToRgb(Pixel[] pixelData, Channel channel) {
         Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
-            double y = color.getFirst() * 360;
-            double co = color.getSecond();
-            double cg = color.getThird();
-
-            result[i] = new Pixel(y + co - cg, y + cg, y - co - cg, color.getAlpha());
+            result[i] = convertYCoCgToRgbOne(color);
         }
 
         return result;
@@ -395,22 +425,27 @@ public class ColorConvertor {
                 }
             }
 
-            Pixel pixel = new Pixel(y, co, cg, color.getAlpha());
+            Pixel pixel = new Pixel(y, co, cg);
             result[i] = pixel;
         }
 
         return result;
     }
 
+
+    public static Pixel convertCmyToRgbOne(Pixel pixel) {
+        double c = pixel.getFirst();
+        double m = pixel.getSecond();
+        double y = pixel.getThird();
+
+        return new Pixel(1 - c, 1 - m, 1 - y);
+    }
+
     public static Pixel[] convertCmyToRgb(Pixel[] pixelData, Channel channel) {
         Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
-            double c = color.getFirst() * 360;
-            double m = color.getSecond();
-            double y = color.getThird();
-
-            result[i] = new Pixel(1 - c, 1 - m, 1 - y, color.getAlpha());
+            result[i] = convertCmyToRgbOne(color);
         }
 
         return result;
@@ -451,7 +486,7 @@ public class ColorConvertor {
                 }
             }
 
-            Pixel pixel = new Pixel(c, m, y, color.getAlpha());
+            Pixel pixel = new Pixel(c, m, y);
             result[i] = pixel;
         }
 

@@ -23,8 +23,6 @@ import java.util.Map;
 public class MainController {
     private static final double scale = 1.05;
     @FXML
-    private ScrollPane scrollPane;
-    @FXML
     private ImageView firstChannel;
     @FXML
     private ImageView secondChannel;
@@ -32,16 +30,9 @@ public class MainController {
     private ImageView thirdChannel;
     @FXML
     private ImageView imageView;
-    @FXML
-    private MenuBar menu;
-    @FXML
-    private Button toRed;
-    @FXML
-    private Button toHSL;
+
     @FXML
     private Label errorMessage;
-    @FXML
-    private Label filename;
     private File file;
     private PictureService pictureService = new PictureService();
     private Picture picture;

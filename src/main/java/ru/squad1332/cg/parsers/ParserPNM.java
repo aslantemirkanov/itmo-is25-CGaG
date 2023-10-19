@@ -49,7 +49,7 @@ public class ParserPNM implements Parser {
                         double g = ((buffer[b + 1] < 0) ? 256 + buffer[b + 1] : buffer[b + 1]) / 255.0;
                         double bl = ((buffer[b + 2] < 0) ? 256 + buffer[b + 2] : buffer[b + 2]) / 255.0;
                         double alpha = 1.0;
-                        pixelData[p++] = new Pixel(r, g, bl, alpha);
+                        pixelData[p++] = new Pixel(r, g, bl);
                     }
                 }
             }
@@ -59,7 +59,7 @@ public class ParserPNM implements Parser {
                     for (int b = 0; b < byteCount; b++) {
                         double r = ((buffer[b] < 0) ? 256 + buffer[b] : buffer[b]) / 255.0;
                         double alpha = 1.0;
-                        pixelData[p++] = new Pixel(r, r, r, alpha);
+                        pixelData[p++] = new Pixel(r, r, r);
                     }
                 }
             }

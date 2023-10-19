@@ -11,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class PicturePNM implements Picture {
 
@@ -27,11 +28,20 @@ public class PicturePNM implements Picture {
     private static final Map<Mode, BiFunction<Pixel[], Channel, Pixel[]>> OTHER_TO_RGB = Map.of(
             Mode.RGB, ColorConvertor::convertRgbToRgb,
             Mode.HSL, ColorConvertor::convertHslToRgb,
-            Mode.HSV, ColorConvertor::convertRgbToHsv,
+            Mode.HSV, ColorConvertor::convertHsvToRgb,
             Mode.YCBCR601, ColorConvertor::convertYCbCr601ToRgb,
             Mode.YCBCR709, ColorConvertor::convertYCbCr709ToRgb,
             Mode.YCOCG, ColorConvertor::convertYCoCgToRgb,
             Mode.CMY, ColorConvertor::convertCmyToRgb
+    );
+    private static final Map<Mode, Function<Pixel, Pixel>> OTHER_TO_RGB_ONE = Map.of(
+            Mode.RGB, ColorConvertor::convertRgbToRgbOne,
+            Mode.HSL, ColorConvertor::convertHslToRgbOne,
+            Mode.HSV, ColorConvertor::convertHsvToRgbOne,
+            Mode.YCBCR601, ColorConvertor::convertYCbCr601ToRgbOne,
+            Mode.YCBCR709, ColorConvertor::convertYCbCr709ToRgbOne,
+            Mode.YCOCG, ColorConvertor::convertYCoCgToRgbOne,
+            Mode.CMY, ColorConvertor::convertCmyToRgbOne
     );
     private String formatType;
     private int width;
@@ -98,34 +108,51 @@ public class PicturePNM implements Picture {
     @Override
     public void writeToFile(File file, Mode mode, Channel channel) {
         try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
+            if (channel.equals(Channel.ALL)) {
+                dataOutputStream.writeBytes(formatType + (char) (10));
+                dataOutputStream.writeBytes(String.valueOf(width) + (char) (32) + String.valueOf(height) + (char) (10));
+                dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
 
-            dataOutputStream.writeBytes(formatType + (char) (10));
-            dataOutputStream.writeBytes(String.valueOf(width) + (char) (32) + String.valueOf(height) + (char) (10));
-            dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
-
-            if (formatType.equals("P6")) {
-                byte[] pixels = new byte[3 * height * width];
-                int cur = 0;
-                for (int i = 0; i < pixelData.length; i++) {
-                    cur = i * 3;
-                    Pixel curPixel = pixelData[i];
-                    int alpha = (int) (curPixel.getAlpha() * 255);
-                    double[] convert = curPixel.getColors();
-                    int first = (int) (convert[0] * 255);
-                    int second = (int) (convert[1] * 255);
-                    int third = (int) (convert[2] * 255);
-                    pixels[cur] = (byte) (first > 127 ? first - 256 : first);
-                    pixels[cur + 1] = (byte) (second > 127 ? second - 256 : second);
-                    pixels[cur + 2] = (byte) (third > 127 ? third - 256 : third);
+                if (formatType.equals("P6")) {
+                    byte[] pixels = new byte[3 * height * width];
+                    int cur = 0;
+                    for (int i = 0; i < pixelData.length; i++) {
+                        cur = i * 3;
+                        Pixel curPixel = pixelData[i];
+                        int alpha = 255;
+                        double[] convert = curPixel.getColors();
+                        int first = (int) (convert[0] * 255);
+                        int second = (int) (convert[1] * 255);
+                        int third = (int) (convert[2] * 255);
+                        pixels[cur] = (byte) (first > 127 ? first - 256 : first);
+                        pixels[cur + 1] = (byte) (second > 127 ? second - 256 : second);
+                        pixels[cur + 2] = (byte) (third > 127 ? third - 256 : third);
+                    }
+                    dataOutputStream.write(pixels);
+                    dataOutputStream.close();
                 }
-                dataOutputStream.write(pixels);
-                dataOutputStream.close();
-            }
 
-            if (formatType.equals("P5")) {
+                if (formatType.equals("P5")) {
+                    byte[] pixels = new byte[height * width];
+                    for (int i = 0; i < pixelData.length; i++) {
+                        int first = (int) (pixelData[i].getColors()[0] * 255);
+                        pixels[i] = (byte) (first > 127 ? first - 256 : first);
+                    }
+                    dataOutputStream.write(pixels);
+                }
+            } else {
+                dataOutputStream.writeBytes("P5" + (char) (10));
+                dataOutputStream.writeBytes(String.valueOf(width) + (char) (32) + String.valueOf(height) + (char) (10));
+                dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
+
                 byte[] pixels = new byte[height * width];
                 for (int i = 0; i < pixelData.length; i++) {
-                    int first = (int) (pixelData[i].getColors()[0] * 255);
+                    int first = 0;
+                    switch (channel) {
+                        case FIRST -> first =  (int) (pixelData[i].getColors()[0] * 255);
+                        case SECOND -> first =  (int) (pixelData[i].getColors()[1] * 255);
+                        case THIRD -> first =  (int) (pixelData[i].getColors()[2] * 255);
+                    }
                     pixels[i] = (byte) (first > 127 ? first - 256 : first);
                 }
                 dataOutputStream.write(pixels);
@@ -140,11 +167,11 @@ public class PicturePNM implements Picture {
     public int[] getIntArgb() {
         int[] intRgba = new int[rgb.length];
         for (int i = 0; i < rgb.length; i++) {
-            double[] rgba = pixelData[i].getColors();
+            double[] rgba = OTHER_TO_RGB_ONE.get(this.mode).apply(this.pixelData[i]).getColors();
             int r = (int) (rgba[0] * 255);
             int g = (int) (rgba[1] * 255);
             int bl = (int) (rgba[2] * 255);
-            int alpha = (int) (rgba[3] * 255);
+            int alpha = 255;
             intRgba[i] = (alpha << 24) + (r << 16) + (g << 8) + (bl);
         }
         return intRgba;
