@@ -2,13 +2,16 @@ package ru.squad1332.cg.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.ScrollEvent;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Pair;
 import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.modes.Channel;
@@ -33,6 +36,7 @@ public class MainController {
 
     @FXML
     private Label errorMessage;
+    private boolean isGammaShow = false;
     private File file;
     private PictureService pictureService = new PictureService();
     private Picture picture;
@@ -196,6 +200,32 @@ public class MainController {
         firstChannel.setImage(null);
         secondChannel.setImage(null);
         thirdChannel.setImage(null);
+    }
+
+    public void onGamma(ActionEvent actionEvent) {
+        showGammaInputDialog(new Stage());
+        System.out.println(curGamma);
+    }
+
+    private void showGammaInputDialog(Stage primaryStage) {
+        TextInputDialog dialog = new TextInputDialog("1.0");
+        dialog.setTitle("Ввод гаммы");
+        dialog.setHeaderText("Введите значение гаммы (от 0.0 до 128.0):");
+        dialog.setContentText("Гамма:");
+
+        dialog.showAndWait().ifPresent(gamma -> {
+            try {
+                double gammaValue = Double.parseDouble(gamma);
+                if (gammaValue >= 0.0 && gammaValue <= 128.0) {
+                    System.out.println("Гамма " + gammaValue);
+                    this.curGamma = gammaValue;
+                } else {
+                    System.out.println("Неверное значение гаммы. Значение должно быть в диапазоне от 0.0 до 128.0.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка при парсинге значения гаммы.");
+            }
+        });
     }
 
 }

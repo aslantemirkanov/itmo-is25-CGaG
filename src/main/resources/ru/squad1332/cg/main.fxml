@@ -78,11 +78,8 @@
                         <MenuItem fx:id="onCmyY" mnemonicParsing="false" onAction="#colorConvertor" text="Y"/>
                     </items>
                 </Menu>
-            </Menu>
-            <Menu mnemonicParsing="false" text="Help">
-                <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
-                </items>
+                <MenuItem mnemonicParsing="false" text="Гамма" onAction="#onGamma">
+                </MenuItem>
             </Menu>
         </menus>
     </MenuBar>
