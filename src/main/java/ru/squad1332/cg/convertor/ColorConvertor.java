@@ -15,16 +15,15 @@ public class ColorConvertor {
     );
 
     public static Pixel[] convertRgbToRgb(Pixel[] pixelData, Channel channel) {
-        Pixel[] result = new Pixel[pixelData.length];
         int[] pos = POSITIONS_MAP.get(channel);
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             double r = color.getFirst();
             double g = color.getSecond();
             double b = color.getThird();
-            result[i] = new Pixel(pos[0] * r, pos[1] * g, pos[2] * b);
+            pixelData[i] = new Pixel(pos[0] * r, pos[1] * g, pos[2] * b);
         }
-        return result;
+        return pixelData;
     }
 
     public static Pixel convertRgbToRgbOne(Pixel pixel) {
@@ -33,7 +32,6 @@ public class ColorConvertor {
 
     public static Pixel[] convertRgbToHsl(Pixel[] pixelData, Channel channel) {
         System.out.println("HSL ");
-        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             double r = color.getFirst();
@@ -85,20 +83,18 @@ public class ColorConvertor {
             }
 
             Pixel pixel = new Pixel(h / 360, s, l);
-            result[i] = pixel;
+            pixelData[i] = pixel;
         }
 
-        return result;
+        return pixelData;
     }
 
     public static Pixel[] convertHslToRgb(Pixel[] pixelData, Channel channel) {
-        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
-            result[i] = convertHslToRgbOne(color);
+            pixelData[i] = convertHslToRgbOne(color);
         }
-
-        return result;
+        return pixelData;
     }
 
     public static Pixel convertHslToRgbOne(Pixel pixel) {
@@ -140,7 +136,6 @@ public class ColorConvertor {
     }
 
     public static Pixel[] convertRgbToHsv(Pixel[] pixelData, Channel channel) {
-        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             double r = color.getFirst();
@@ -192,22 +187,21 @@ public class ColorConvertor {
 
 
             Pixel pixel = new Pixel(h / 360, s, v);
-            result[i] = pixel;
+            pixelData[i] = pixel;
         }
 
-        return result;
+        return pixelData;
     }
 
 
     public static Pixel[] convertHsvToRgb(Pixel[] pixelData, Channel channel) {
-        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
 
-            result[i] = convertHsvToRgbOne(color);
+            pixelData[i] = convertHsvToRgbOne(color);
         }
 
-        return result;
+        return pixelData;
     }
 
     public static Pixel convertHsvToRgbOne(Pixel pixel) {
@@ -311,16 +305,14 @@ public class ColorConvertor {
     }
 
     private static Pixel[] convertYCbCrToRgb(Pixel[] pixelData, Channel channel, YCbCrFormat format) {
-        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
-            result[i] = convertYCbCrToRgbOne(color, format);
+            pixelData[i] = convertYCbCrToRgbOne(color, format);
         }
-        return result;
+        return pixelData;
     }
 
     private static Pixel[] convertRgbToYCbCr(Pixel[] pixelData, Channel channel, YCbCrFormat format) {
-        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             double r = color.getFirst() * 255;
@@ -366,10 +358,9 @@ public class ColorConvertor {
                 }
             }
 
-
-            result[i] = new Pixel(y / 255, cb / 255, cr / 255);
+            pixelData[i] = new Pixel(y / 255, cb / 255, cr / 255);
         }
-        return result;
+        return pixelData;
     }
 
     public static Pixel convertYCoCgToRgbOne(Pixel pixel) {
@@ -381,17 +372,15 @@ public class ColorConvertor {
     }
 
     public static Pixel[] convertYCoCgToRgb(Pixel[] pixelData, Channel channel) {
-        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
-            result[i] = convertYCoCgToRgbOne(color);
+            pixelData[i] = convertYCoCgToRgbOne(color);
         }
 
-        return result;
+        return pixelData;
     }
 
     public static Pixel[] convertRgbToYCoCg(Pixel[] pixelData, Channel channel) {
-        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             double r = color.getFirst();
@@ -426,10 +415,10 @@ public class ColorConvertor {
             }
 
             Pixel pixel = new Pixel(y, co, cg);
-            result[i] = pixel;
+            pixelData[i] = pixel;
         }
 
-        return result;
+        return pixelData;
     }
 
 
@@ -442,17 +431,15 @@ public class ColorConvertor {
     }
 
     public static Pixel[] convertCmyToRgb(Pixel[] pixelData, Channel channel) {
-        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
-            result[i] = convertCmyToRgbOne(color);
+            pixelData[i] = convertCmyToRgbOne(color);
         }
 
-        return result;
+        return pixelData;
     }
 
     public static Pixel[] convertRgbToCmy(Pixel[] pixelData, Channel channel) {
-        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             double r = color.getFirst();
@@ -487,10 +474,10 @@ public class ColorConvertor {
             }
 
             Pixel pixel = new Pixel(c, m, y);
-            result[i] = pixel;
+            pixelData[i] = pixel;
         }
 
-        return result;
+        return pixelData;
     }
 
     public static int[] convertToRgb(Pixel[] pixelData, Channel channel) {

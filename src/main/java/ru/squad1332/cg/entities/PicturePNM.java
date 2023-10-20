@@ -10,6 +10,7 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -109,7 +110,8 @@ public class PicturePNM implements Picture {
     @Override
     public void writeToFile(File file, Mode mode, Channel channel) {
         try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
-            Pixel[] pixelsData = OTHER_TO_RGB.get(this.mode).apply(this.pixelData, this.channel);
+            Pixel[] pixelsData = Arrays.copyOf(this.pixelData, this.pixelData.length);
+            pixelsData = OTHER_TO_RGB.get(this.mode).apply(pixelsData, this.channel);
             pixelsData = RGB_TO_OTHER.get(mode).apply(pixelsData, channel);
             if (channel.equals(Channel.ALL)) {
                 dataOutputStream.writeBytes(formatType + (char) (10));
@@ -152,9 +154,9 @@ public class PicturePNM implements Picture {
                 for (int i = 0; i < pixelsData.length; i++) {
                     int first = 0;
                     switch (channel) {
-                        case FIRST -> first =  (int) (pixelsData[i].getColors()[0] * 255);
-                        case SECOND -> first =  (int) (pixelsData[i].getColors()[1] * 255);
-                        case THIRD -> first =  (int) (pixelsData[i].getColors()[2] * 255);
+                        case FIRST -> first = (int) (pixelsData[i].getColors()[0] * 255);
+                        case SECOND -> first = (int) (pixelsData[i].getColors()[1] * 255);
+                        case THIRD -> first = (int) (pixelsData[i].getColors()[2] * 255);
                     }
                     pixels[i] = (byte) (first > 127 ? first - 256 : first);
                 }
@@ -194,11 +196,17 @@ public class PicturePNM implements Picture {
     }
 
     private Pixel[] pixelConversion(double gamma, Mode mode, Channel channel) {
-        Pixel[] pixels = OTHER_TO_RGB.get(this.mode).apply(this.pixelData, this.channel);
-        pixels = RGB_TO_OTHER.get(mode).apply(pixels, channel);
-        pixels = OTHER_TO_RGB.get(mode).apply(pixels, channel);
-        pixels = GammaCorrection.convertGamma(pixels, 1.0, gamma);
-        return pixels;
+        Pixel[] copy = Arrays.copyOf(this.pixelData, this.pixelData.length);
+        System.out.println("COPY");
+        copy = OTHER_TO_RGB.get(this.mode).apply(copy, this.channel);
+        System.out.println("RGB");
+        copy = RGB_TO_OTHER.get(mode).apply(copy, channel);
+        System.out.println("OTHER");
+        copy = OTHER_TO_RGB.get(mode).apply(copy, channel);
+        System.out.println("RGB AGAIN");
+        copy = GammaCorrection.convertGamma(copy, 1.0, gamma);
+        System.out.println("GAMMA");
+        return copy;
     }
 
     @Override

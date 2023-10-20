@@ -25,6 +25,7 @@ import java.util.Map;
 
 public class MainController {
     private static final double scale = 1.05;
+    private static final Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = getMapModeChannel();
     @FXML
     private ImageView firstChannel;
     @FXML
@@ -33,7 +34,6 @@ public class MainController {
     private ImageView thirdChannel;
     @FXML
     private ImageView imageView;
-
     @FXML
     private Label errorMessage;
     private boolean isGammaShow = false;
@@ -43,7 +43,6 @@ public class MainController {
     private Mode mode = Mode.RGB;
     private Channel channel = Channel.ALL;
     private double zoomFactor = scale;
-
     private double curGamma = 1.0;
 
     private static Map<String, Pair<Mode, Channel>> getMapModeChannel() {
@@ -98,7 +97,6 @@ public class MainController {
                 this.picture = pictureService.openPicture(this.file.getPath(), this.mode, this.channel);
                 draw(picture);
             }
-
         } catch (Throwable e) {
             e.printStackTrace();
             this.errorMessage.setText("Не удалось открыть изображение");
@@ -131,15 +129,15 @@ public class MainController {
         writeOnImageView(imageView, mode, Channel.ALL);
     }
 
-    private void convertGamma(Picture picture, double newGamma){
+    private void convertGamma(Picture picture, double newGamma) {
 
     }
 
-    private void assignGamma(double gamma){
+    private void assignGamma(double gamma) {
         curGamma = gamma;
     }
 
-    private void writeOnImageView(ImageView view,Mode mode, Channel channel) {
+    private void writeOnImageView(ImageView view, Mode mode, Channel channel) {
         this.mode = mode;
         this.channel = channel;
         WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
@@ -173,7 +171,7 @@ public class MainController {
     protected void colorConvertor(ActionEvent event) {
         MenuItem menuItem = (MenuItem) event.getSource();
         String format = menuItem.getId();
-        Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = getMapModeChannel();
+
         draw(this.picture, MODE_TO_FUNC.get(format).getLeft(), MODE_TO_FUNC.get(format).getRight());
     }
 
