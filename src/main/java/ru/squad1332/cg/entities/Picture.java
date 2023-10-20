@@ -21,11 +21,10 @@ public interface Picture {
     void writeToFile(File file, Mode mode, Channel channel);
 
     int[] getIntArgb();
-    int[] getIntArgb(double gamma);
 
     void setMode(Mode mode);
     void setChannel(Channel channel);
 
 
-    int[] getIntArgb(double curGamma, Mode mode, Channel channel);
+    int[] getIntArgb(Mode mode, Channel channel);
 }

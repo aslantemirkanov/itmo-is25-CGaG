@@ -43,7 +43,6 @@ public class MainController {
     private Mode mode = Mode.RGB;
     private Channel channel = Channel.ALL;
     private double zoomFactor = scale;
-    private double curGamma = 1.0;
 
     private static Map<String, Pair<Mode, Channel>> getMapModeChannel() {
         Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = new HashMap<>();
@@ -129,13 +128,6 @@ public class MainController {
         writeOnImageView(imageView, mode, Channel.ALL);
     }
 
-    private void convertGamma(Picture picture, double newGamma) {
-
-    }
-
-    private void assignGamma(double gamma) {
-        curGamma = gamma;
-    }
 
     private void writeOnImageView(ImageView view, Mode mode, Channel channel) {
         this.mode = mode;
@@ -144,7 +136,7 @@ public class MainController {
         WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
         image.getPixelWriter().setPixels(0, 0,
                 picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(this.curGamma, mode, channel),
+                format, picture.getIntArgb(mode, channel),
                 0, picture.getWidth());
         view.setImage(image);
     }
@@ -195,34 +187,8 @@ public class MainController {
         firstChannel.setImage(null);
         secondChannel.setImage(null);
         thirdChannel.setImage(null);
-        this.curGamma = 1.0;
     }
 
-    public void onGamma(ActionEvent actionEvent) {
-        showGammaInputDialog(new Stage());
-        System.out.println(curGamma);
-    }
 
-    private void showGammaInputDialog(Stage primaryStage) {
-        TextInputDialog dialog = new TextInputDialog("1.0");
-        dialog.setTitle("Ввод гаммы");
-        dialog.setHeaderText("Введите значение гаммы (от 0.0 до 128.0):");
-        dialog.setContentText("Гамма:");
-
-        dialog.showAndWait().ifPresent(gamma -> {
-            try {
-                double gammaValue = Double.parseDouble(gamma);
-                if (gammaValue >= 0.0 && gammaValue <= 128.0) {
-                    System.out.println("Гамма " + gammaValue);
-                    this.curGamma = gammaValue;
-                    draw(this.picture);
-                } else {
-                    System.out.println("Неверное значение гаммы. Значение должно быть в диапазоне от 0.0 до 128.0.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Ошибка при парсинге значения гаммы.");
-            }
-        });
-    }
 
 }

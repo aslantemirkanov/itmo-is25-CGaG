@@ -168,22 +168,19 @@ public class PicturePNM implements Picture {
         }
     }
 
+
+
     @Override
     public int[] getIntArgb() {
-        return getIntArgb(1.0);
+        return getIntArgb(this.mode, this.channel);
     }
 
     @Override
-    public int[] getIntArgb(double gamma) {
-        return getIntArgb(gamma, this.mode, this.channel);
-    }
-
-    @Override
-    public int[] getIntArgb(double gamma, Mode mode, Channel channel) {
+    public int[] getIntArgb(Mode mode, Channel channel) {
         System.out.println("Режим картинки " + this.mode + " " + this.channel);
         System.out.println("Режим текущий " + mode + " " + channel);
         int[] intRgba = new int[pixelData.length];
-        Pixel[] pixels = pixelConversion(gamma, mode, channel);
+        Pixel[] pixels = pixelConversion(mode, channel);
         for (int i = 0; i < pixels.length; i++) {
             double[] rgba = pixels[i].getColors();
             int r = (int) (rgba[0] * 255);
@@ -195,7 +192,7 @@ public class PicturePNM implements Picture {
         return intRgba;
     }
 
-    private Pixel[] pixelConversion(double gamma, Mode mode, Channel channel) {
+    private Pixel[] pixelConversion(Mode mode, Channel channel) {
         Pixel[] copy = Arrays.copyOf(this.pixelData, this.pixelData.length);
         System.out.println("COPY");
         copy = OTHER_TO_RGB.get(this.mode).apply(copy, this.channel);
@@ -204,8 +201,6 @@ public class PicturePNM implements Picture {
         System.out.println("OTHER");
         copy = OTHER_TO_RGB.get(mode).apply(copy, channel);
         System.out.println("RGB AGAIN");
-        copy = GammaCorrection.convertGamma(copy, 1.0, gamma);
-        System.out.println("GAMMA");
         return copy;
     }
 
