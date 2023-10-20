@@ -140,6 +140,8 @@ public class MainController {
     }
 
     private void writeOnImageView(ImageView view,Mode mode, Channel channel) {
+        this.mode = mode;
+        this.channel = channel;
         WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
         WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
         image.getPixelWriter().setPixels(0, 0,

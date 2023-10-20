@@ -175,6 +175,8 @@ public class PicturePNM implements Picture {
 
     @Override
     public int[] getIntArgb(double gamma, Mode mode, Channel channel) {
+        System.out.println("Режим картинки " + this.mode + " " + this.channel);
+        System.out.println("Режим текущий " + mode + " " + channel);
         int[] intRgba = new int[pixelData.length];
         Pixel[] pixels = OTHER_TO_RGB.get(this.mode).apply(this.pixelData, this.channel);
         pixels = RGB_TO_OTHER.get(mode).apply(pixels, channel);
