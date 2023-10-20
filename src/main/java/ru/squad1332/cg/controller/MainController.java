@@ -40,6 +40,8 @@ public class MainController {
     private Channel channel = Channel.ALL;
     private double zoomFactor = scale;
 
+    private double curGamma = 0.0;
+
     private static Map<String, Pair<Mode, Channel>> getMapModeChannel() {
         Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = new HashMap<>();
 
@@ -128,6 +130,14 @@ public class MainController {
         writeOnImageView(thirdChannel);
         picture.convert(mode, Channel.ALL);
         writeOnImageView(imageView);
+    }
+
+    private void convertGamma(Picture picture, double newGamma){
+
+    }
+
+    private void assignGamma(double gamma){
+        curGamma = gamma;
     }
 
     private void writeOnImageView(ImageView view) {
