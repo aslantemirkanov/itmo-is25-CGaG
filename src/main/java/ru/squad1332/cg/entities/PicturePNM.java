@@ -52,6 +52,7 @@ public class PicturePNM implements Picture {
     private Pixel[] pixelData;
     private Mode mode = Mode.RGB;
     private Channel channel = Channel.ALL;
+    private double gamma = 0;
 
 
     public String getFormatType() {
@@ -108,6 +109,8 @@ public class PicturePNM implements Picture {
     @Override
     public void writeToFile(File file, Mode mode, Channel channel) {
         try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
+            Pixel[] pixelsData = OTHER_TO_RGB.get(this.mode).apply(this.pixelData, this.channel);
+            pixelsData = RGB_TO_OTHER.get(mode).apply(pixelsData, channel);
             if (channel.equals(Channel.ALL)) {
                 dataOutputStream.writeBytes(formatType + (char) (10));
                 dataOutputStream.writeBytes(String.valueOf(width) + (char) (32) + String.valueOf(height) + (char) (10));
@@ -116,9 +119,9 @@ public class PicturePNM implements Picture {
                 if (formatType.equals("P6")) {
                     byte[] pixels = new byte[3 * height * width];
                     int cur = 0;
-                    for (int i = 0; i < pixelData.length; i++) {
+                    for (int i = 0; i < pixelsData.length; i++) {
                         cur = i * 3;
-                        Pixel curPixel = pixelData[i];
+                        Pixel curPixel = pixelsData[i];
                         int alpha = 255;
                         double[] convert = curPixel.getColors();
                         int first = (int) (convert[0] * 255);
@@ -134,8 +137,8 @@ public class PicturePNM implements Picture {
 
                 if (formatType.equals("P5")) {
                     byte[] pixels = new byte[height * width];
-                    for (int i = 0; i < pixelData.length; i++) {
-                        int first = (int) (pixelData[i].getColors()[0] * 255);
+                    for (int i = 0; i < pixelsData.length; i++) {
+                        int first = (int) (pixelsData[i].getColors()[0] * 255);
                         pixels[i] = (byte) (first > 127 ? first - 256 : first);
                     }
                     dataOutputStream.write(pixels);
@@ -146,12 +149,12 @@ public class PicturePNM implements Picture {
                 dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
 
                 byte[] pixels = new byte[height * width];
-                for (int i = 0; i < pixelData.length; i++) {
+                for (int i = 0; i < pixelsData.length; i++) {
                     int first = 0;
                     switch (channel) {
-                        case FIRST -> first =  (int) (pixelData[i].getColors()[0] * 255);
-                        case SECOND -> first =  (int) (pixelData[i].getColors()[1] * 255);
-                        case THIRD -> first =  (int) (pixelData[i].getColors()[2] * 255);
+                        case FIRST -> first =  (int) (pixelsData[i].getColors()[0] * 255);
+                        case SECOND -> first =  (int) (pixelsData[i].getColors()[1] * 255);
+                        case THIRD -> first =  (int) (pixelsData[i].getColors()[2] * 255);
                     }
                     pixels[i] = (byte) (first > 127 ? first - 256 : first);
                 }
@@ -178,10 +181,7 @@ public class PicturePNM implements Picture {
         System.out.println("Режим картинки " + this.mode + " " + this.channel);
         System.out.println("Режим текущий " + mode + " " + channel);
         int[] intRgba = new int[pixelData.length];
-        Pixel[] pixels = OTHER_TO_RGB.get(this.mode).apply(this.pixelData, this.channel);
-        pixels = RGB_TO_OTHER.get(mode).apply(pixels, channel);
-        pixels = OTHER_TO_RGB.get(mode).apply(pixels, channel);
-        pixels = GammaCorrection.convertGamma(pixels, 1.0, gamma);
+        Pixel[] pixels = pixelConversion(gamma, mode, channel);
         for (int i = 0; i < pixels.length; i++) {
             double[] rgba = pixels[i].getColors();
             int r = (int) (rgba[0] * 255);
@@ -193,6 +193,13 @@ public class PicturePNM implements Picture {
         return intRgba;
     }
 
+    private Pixel[] pixelConversion(double gamma, Mode mode, Channel channel) {
+        Pixel[] pixels = OTHER_TO_RGB.get(this.mode).apply(this.pixelData, this.channel);
+        pixels = RGB_TO_OTHER.get(mode).apply(pixels, channel);
+        pixels = OTHER_TO_RGB.get(mode).apply(pixels, channel);
+        pixels = GammaCorrection.convertGamma(pixels, 1.0, gamma);
+        return pixels;
+    }
 
     @Override
     public void setMode(Mode mode) {
