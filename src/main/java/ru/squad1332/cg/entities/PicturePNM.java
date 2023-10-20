@@ -2,6 +2,7 @@ package ru.squad1332.cg.entities;
 
 
 import ru.squad1332.cg.convertor.ColorConvertor;
+import ru.squad1332.cg.gamma.GammaCorrection;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
 
@@ -49,7 +50,6 @@ public class PicturePNM implements Picture {
     private int maxColorValue;
     private String path;
     private Pixel[] pixelData;
-    private Pixel[] rgb;
     private Mode mode = Mode.RGB;
     private Channel channel = Channel.ALL;
 
@@ -165,9 +165,23 @@ public class PicturePNM implements Picture {
 
     @Override
     public int[] getIntArgb() {
-        int[] intRgba = new int[rgb.length];
-        for (int i = 0; i < rgb.length; i++) {
-            double[] rgba = OTHER_TO_RGB_ONE.get(this.mode).apply(this.pixelData[i]).getColors();
+        return getIntArgb(1.0);
+    }
+
+    @Override
+    public int[] getIntArgb(double gamma) {
+        return getIntArgb(gamma, this.mode, this.channel);
+    }
+
+    @Override
+    public int[] getIntArgb(double gamma, Mode mode, Channel channel) {
+        int[] intRgba = new int[pixelData.length];
+        Pixel[] pixels = OTHER_TO_RGB.get(this.mode).apply(this.pixelData, this.channel);
+        pixels = RGB_TO_OTHER.get(mode).apply(pixels, channel);
+        pixels = OTHER_TO_RGB.get(mode).apply(pixels, channel);
+        pixels = GammaCorrection.convertGamma(pixels, 1.0, gamma);
+        for (int i = 0; i < pixels.length; i++) {
+            double[] rgba = pixels[i].getColors();
             int r = (int) (rgba[0] * 255);
             int g = (int) (rgba[1] * 255);
             int bl = (int) (rgba[2] * 255);
@@ -177,15 +191,6 @@ public class PicturePNM implements Picture {
         return intRgba;
     }
 
-    @Override
-    public void convert(Mode mode, Channel channel) {
-        if (this.mode.equals(mode) && this.channel.equals(channel)) {
-            return;
-        }
-        this.pixelData = RGB_TO_OTHER.get(mode).apply(this.rgb, channel);
-        this.mode = mode;
-        this.channel = channel;
-    }
 
     @Override
     public void setMode(Mode mode) {
@@ -195,19 +200,5 @@ public class PicturePNM implements Picture {
     @Override
     public void setChannel(Channel channel) {
         this.channel = channel;
-    }
-
-    @Override
-    public void setRgb(Mode mode, Channel channel) {
-        System.out.println("RGB set " + mode + " " + channel);
-        this.rgb = OTHER_TO_RGB.get(mode).apply(this.pixelData, channel);
-    }
-
-    public Pixel[] getRgb() {
-        return rgb;
-    }
-
-    public void setRgb(Pixel[] rgb) {
-        this.rgb = rgb;
     }
 }

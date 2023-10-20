@@ -2,17 +2,16 @@ package ru.squad1332.cg.gamma;
 
 import ru.squad1332.cg.entities.Pixel;
 
-public class gammaCorrection {
+public class GammaCorrection {
 
 
-    public Pixel[] convertGamma(Pixel[] pixelData, double curGamma, double newGamma) {
-        Pixel[] newPixelData = removeGamma(pixelData, curGamma);
-        newPixelData = assignGamma(newPixelData, newGamma);
-        return newPixelData;
+    public static Pixel[] convertGamma(Pixel[] pixelData, double curGamma, double newGamma) {
+        pixelData = removeGamma(pixelData, curGamma);
+        pixelData = assignGamma(pixelData, newGamma);
+        return pixelData;
     }
 
-    private Pixel[] removeGamma(Pixel[] pixelData, double gamma) {
-        Pixel[] newPixelData = new Pixel[pixelData.length];
+    private static Pixel[] removeGamma(Pixel[] pixelData, double gamma) {
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             double r = color.getFirst();
@@ -27,13 +26,12 @@ public class gammaCorrection {
                 g = Math.pow(g, 1.0 / gamma);
                 b = Math.pow(b, 1.0 / gamma);
             }
-            newPixelData[i] = new Pixel(r, g, b);
+            pixelData[i] = new Pixel(r, g, b);
         }
-        return newPixelData;
+        return pixelData;
     }
 
-    private Pixel[] assignGamma(Pixel[] pixelData, double gamma) {
-        Pixel[] newPixelData = new Pixel[pixelData.length];
+    private static Pixel[] assignGamma(Pixel[] pixelData, double gamma) {
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             double r = color.getFirst();
@@ -48,12 +46,12 @@ public class gammaCorrection {
                 g = Math.pow(g, gamma);
                 b = Math.pow(b, gamma);
             }
-            newPixelData[i] = new Pixel(r, g, b);
+            pixelData[i] = new Pixel(r, g, b);
         }
-        return newPixelData;
+        return pixelData;
     }
 
-    private double srgbToLineal(double channel) {
+    private static double srgbToLineal(double channel) {
         if (channel <= 0.04045) {
             return channel / 12.92;
         } else {
@@ -61,7 +59,7 @@ public class gammaCorrection {
         }
     }
 
-    private double linealToSRGB(double channel) {
+    private static double linealToSRGB(double channel) {
         if (channel < 0.0031308) {
             return channel * 12.92;
         } else {

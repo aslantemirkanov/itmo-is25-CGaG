@@ -27,7 +27,7 @@ public class PictureService {
         try {
             getType(filePath);
             PicturePNM picture = parser.parse(filePath);
-            picture.setRgb(mode, channel);
+//            picture.setRgb(mode, channel);
             return picture;
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);

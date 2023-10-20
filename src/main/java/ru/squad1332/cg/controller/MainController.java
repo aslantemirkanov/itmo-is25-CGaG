@@ -44,7 +44,7 @@ public class MainController {
     private Channel channel = Channel.ALL;
     private double zoomFactor = scale;
 
-    private double curGamma = 0.0;
+    private double curGamma = 1.0;
 
     private static Map<String, Pair<Mode, Channel>> getMapModeChannel() {
         Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = new HashMap<>();
@@ -106,13 +106,12 @@ public class MainController {
     }
 
     private void draw(Picture picture) {
-        writeOnImageView(imageView);
+        writeOnImageView(imageView, this.mode, this.channel);
     }
 
     private void draw(Picture picture, Mode mode, Channel channel) {
         this.mode = mode;
         this.channel = channel;
-        picture.convert(mode, channel);
         if (channel.equals(Channel.ALL)) {
             draw(picture, mode);
             return;
@@ -121,19 +120,15 @@ public class MainController {
             secondChannel.setImage(null);
             thirdChannel.setImage(null);
         }
-        writeOnImageView(imageView);
+        writeOnImageView(imageView, mode, channel);
     }
 
     private void draw(Picture picture, Mode mode) {
         this.mode = mode;
-        picture.convert(mode, Channel.FIRST);
-        writeOnImageView(firstChannel);
-        picture.convert(mode, Channel.SECOND);
-        writeOnImageView(secondChannel);
-        picture.convert(mode, Channel.THIRD);
-        writeOnImageView(thirdChannel);
-        picture.convert(mode, Channel.ALL);
-        writeOnImageView(imageView);
+        writeOnImageView(firstChannel, mode, Channel.FIRST);
+        writeOnImageView(secondChannel, mode, Channel.SECOND);
+        writeOnImageView(thirdChannel, mode, Channel.THIRD);
+        writeOnImageView(imageView, mode, Channel.ALL);
     }
 
     private void convertGamma(Picture picture, double newGamma){
@@ -144,12 +139,12 @@ public class MainController {
         curGamma = gamma;
     }
 
-    private void writeOnImageView(ImageView view) {
+    private void writeOnImageView(ImageView view,Mode mode, Channel channel) {
         WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
         WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
         image.getPixelWriter().setPixels(0, 0,
                 picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(),
+                format, picture.getIntArgb(this.curGamma, mode, channel),
                 0, picture.getWidth());
         view.setImage(image);
     }
@@ -200,6 +195,7 @@ public class MainController {
         firstChannel.setImage(null);
         secondChannel.setImage(null);
         thirdChannel.setImage(null);
+        this.curGamma = 1.0;
     }
 
     public void onGamma(ActionEvent actionEvent) {
@@ -219,6 +215,7 @@ public class MainController {
                 if (gammaValue >= 0.0 && gammaValue <= 128.0) {
                     System.out.println("Гамма " + gammaValue);
                     this.curGamma = gammaValue;
+                    draw(this.picture);
                 } else {
                     System.out.println("Неверное значение гаммы. Значение должно быть в диапазоне от 0.0 до 128.0.");
                 }
