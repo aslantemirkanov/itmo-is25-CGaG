@@ -7,6 +7,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.canvas.Canvas?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_CENTER" prefHeight="1000.0" prefWidth="1920.0"
       xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="ru.squad1332.cg.controller.MainController">
 
@@ -84,8 +85,7 @@
     <Label fx:id="filename" text="Выберите фото"/>
 
     <ScrollPane fx:id="scrollPane" maxHeight="1080" minHeight="150">
-        <ImageView fx:id="imageView" onScroll="#handleScroll" pickOnBounds="true"
-                   preserveRatio="true"/>
+        <Canvas fx:id="imageView" onScroll="#handleScroll" pickOnBounds="true"/>
     </ScrollPane>
 
     <HBox>

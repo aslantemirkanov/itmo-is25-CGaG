@@ -2,6 +2,8 @@ package ru.squad1332.cg.controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
@@ -33,7 +35,7 @@ public class MainController {
     @FXML
     private ImageView thirdChannel;
     @FXML
-    private ImageView imageView;
+    private Canvas imageView;
     @FXML
     private Label errorMessage;
     private boolean isGammaShow = false;
@@ -140,6 +142,18 @@ public class MainController {
                 0, picture.getWidth());
         view.setImage(image);
     }
+    private void writeOnImageView(Canvas view, Mode mode, Channel channel) {
+        this.mode = mode;
+        this.channel = channel;
+        GraphicsContext gc = view.getGraphicsContext2D();
+        WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
+        gc.getPixelWriter().setPixels(0, 0,
+                picture.getWidth(), picture.getHeight(),
+                format, picture.getIntArgb(mode, channel),
+                0, picture.getWidth());
+
+    }
+
 
     @FXML
     protected void onSaveAs(ActionEvent event) {
@@ -188,7 +202,6 @@ public class MainController {
         secondChannel.setImage(null);
         thirdChannel.setImage(null);
     }
-
 
 
 }
