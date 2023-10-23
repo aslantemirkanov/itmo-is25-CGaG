@@ -8,6 +8,8 @@ import java.io.File;
 public interface Picture {
     Pixel[] getPixelData();
 
+    void setPixelData(Pixel[] pixelData);
+
     String getFormatType();
 
     int getWidth();
@@ -23,8 +25,13 @@ public interface Picture {
     int[] getIntArgb();
 
     void setMode(Mode mode);
+
     void setChannel(Channel channel);
 
 
     int[] getIntArgb(Mode mode, Channel channel);
+
+    Pixel[] getArgb(Mode mode, Channel channel);
+
+    Mode getMode();
 }
