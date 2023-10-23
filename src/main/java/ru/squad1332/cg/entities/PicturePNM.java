@@ -16,7 +16,7 @@ import java.util.function.Function;
 
 public class PicturePNM implements Picture {
 
-    private static final Map<Mode, BiFunction<Pixel[], Channel, Pixel[]>> RGB_TO_OTHER = Map.of(
+    public static final Map<Mode, BiFunction<Pixel[], Channel, Pixel[]>> RGB_TO_OTHER = Map.of(
             Mode.RGB, ColorConvertor::convertRgbToRgb,
             Mode.HSL, ColorConvertor::convertRgbToHsl,
             Mode.HSV, ColorConvertor::convertRgbToHsv,
@@ -26,7 +26,7 @@ public class PicturePNM implements Picture {
             Mode.CMY, ColorConvertor::convertRgbToCmy
     );
 
-    private static final Map<Mode, BiFunction<Pixel[], Channel, Pixel[]>> OTHER_TO_RGB = Map.of(
+    public static final Map<Mode, BiFunction<Pixel[], Channel, Pixel[]>> OTHER_TO_RGB = Map.of(
             Mode.RGB, ColorConvertor::convertRgbToRgb,
             Mode.HSL, ColorConvertor::convertHslToRgb,
             Mode.HSV, ColorConvertor::convertHsvToRgb,
@@ -35,7 +35,7 @@ public class PicturePNM implements Picture {
             Mode.YCOCG, ColorConvertor::convertYCoCgToRgb,
             Mode.CMY, ColorConvertor::convertCmyToRgb
     );
-    private static final Map<Mode, Function<Pixel, Pixel>> OTHER_TO_RGB_ONE = Map.of(
+    public static final Map<Mode, Function<Pixel, Pixel>> OTHER_TO_RGB_ONE = Map.of(
             Mode.RGB, ColorConvertor::convertRgbToRgbOne,
             Mode.HSL, ColorConvertor::convertHslToRgbOne,
             Mode.HSV, ColorConvertor::convertHsvToRgbOne,
@@ -102,6 +102,7 @@ public class PicturePNM implements Picture {
         return pixelData;
     }
 
+    @Override
     public void setPixelData(Pixel[] pixelData) {
         this.pixelData = pixelData;
     }
@@ -165,23 +166,17 @@ public class PicturePNM implements Picture {
             throw new RuntimeException(e);
         }
     }
-
     @Override
-    public int[] getIntArgb() {
-        return getIntArgb(1.0);
-    }
-
-    @Override
-    public int[] getIntArgb(double gamma) {
-        return getIntArgb(gamma, this.mode, this.channel);
-    }
-
-    @Override
-    public int[] getIntArgb(double gamma, Mode mode, Channel channel) {
+    public int[] getIntArgb(Mode mode, Channel channel) {
         System.out.println("Режим картинки " + this.mode + " " + this.channel);
         System.out.println("Режим текущий " + mode + " " + channel);
+
         int[] intRgba = new int[pixelData.length];
-        Pixel[] pixels = pixelConversion(gamma, mode, channel);
+        Pixel[] pixels = OTHER_TO_RGB.get(this.mode).apply(this.pixelData, this.channel);
+
+        pixels = RGB_TO_OTHER.get(mode).apply(pixels, channel);
+        pixels = OTHER_TO_RGB.get(mode).apply(pixels, channel);
+
         for (int i = 0; i < pixels.length; i++) {
             double[] rgba = pixels[i].getColors();
             int r = (int) (rgba[0] * 255);
@@ -193,12 +188,16 @@ public class PicturePNM implements Picture {
         return intRgba;
     }
 
-    private Pixel[] pixelConversion(double gamma, Mode mode, Channel channel) {
-        Pixel[] pixels = OTHER_TO_RGB.get(this.mode).apply(this.pixelData, this.channel);
-        pixels = RGB_TO_OTHER.get(mode).apply(pixels, channel);
-        pixels = OTHER_TO_RGB.get(mode).apply(pixels, channel);
-        pixels = GammaCorrection.convertGamma(pixels, 1.0, gamma);
+    @Override
+    public Pixel[] getArgb(Mode mode, Channel channel) {
+        Pixel[] pixels = OTHER_TO_RGB.get(mode).apply(this.pixelData, channel);
+        this.pixelData = pixels;
         return pixels;
+    }
+
+    @Override
+    public Mode getMode() {
+        return mode;
     }
 
     @Override

@@ -14,14 +14,21 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Pair;
 import ru.squad1332.cg.entities.Picture;
+import ru.squad1332.cg.entities.PicturePNM;
+import ru.squad1332.cg.entities.Pixel;
+import ru.squad1332.cg.gamma.GammaCorrection;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.services.PictureService;
 
 import java.io.File;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
+import static ru.squad1332.cg.entities.PicturePNM.OTHER_TO_RGB;
+import static ru.squad1332.cg.entities.PicturePNM.RGB_TO_OTHER;
 
 public class MainController {
     private static final double scale = 1.05;
@@ -44,47 +51,50 @@ public class MainController {
     private Channel channel = Channel.ALL;
     private double zoomFactor = scale;
 
-    private double curGamma = 1.0;
+    private double interpretGamma = 0.0;
+    private double curGamma = 0.0;
+
+
 
     private static Map<String, Pair<Mode, Channel>> getMapModeChannel() {
-        Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = new HashMap<>();
+        Map<String, Pair<Mode, Channel>> ACTION_TO_PAIR = new HashMap<>();
 
-        MODE_TO_FUNC.put("onToRgb", Pair.of(Mode.RGB, Channel.ALL));
-        MODE_TO_FUNC.put("onToRed", Pair.of(Mode.RGB, Channel.FIRST));
-        MODE_TO_FUNC.put("onToGreen", Pair.of(Mode.RGB, Channel.SECOND));
-        MODE_TO_FUNC.put("onToBlue", Pair.of(Mode.RGB, Channel.THIRD));
+        ACTION_TO_PAIR.put("onToRgb", Pair.of(Mode.RGB, Channel.ALL));
+        ACTION_TO_PAIR.put("onToRed", Pair.of(Mode.RGB, Channel.FIRST));
+        ACTION_TO_PAIR.put("onToGreen", Pair.of(Mode.RGB, Channel.SECOND));
+        ACTION_TO_PAIR.put("onToBlue", Pair.of(Mode.RGB, Channel.THIRD));
 
-        MODE_TO_FUNC.put("onToHsl", Pair.of(Mode.HSL, Channel.ALL));
-        MODE_TO_FUNC.put("onToHue", Pair.of(Mode.HSL, Channel.FIRST));
-        MODE_TO_FUNC.put("onToSaturation", Pair.of(Mode.HSL, Channel.SECOND));
-        MODE_TO_FUNC.put("onToLightness", Pair.of(Mode.HSL, Channel.THIRD));
+        ACTION_TO_PAIR.put("onToHsl", Pair.of(Mode.HSL, Channel.ALL));
+        ACTION_TO_PAIR.put("onToHue", Pair.of(Mode.HSL, Channel.FIRST));
+        ACTION_TO_PAIR.put("onToSaturation", Pair.of(Mode.HSL, Channel.SECOND));
+        ACTION_TO_PAIR.put("onToLightness", Pair.of(Mode.HSL, Channel.THIRD));
 
-        MODE_TO_FUNC.put("onToHsv", Pair.of(Mode.HSV, Channel.ALL));
-        MODE_TO_FUNC.put("onToHsvHue", Pair.of(Mode.HSV, Channel.FIRST));
-        MODE_TO_FUNC.put("onToHsvSaturation", Pair.of(Mode.HSV, Channel.SECOND));
-        MODE_TO_FUNC.put("onToHsvValue", Pair.of(Mode.HSV, Channel.THIRD));
+        ACTION_TO_PAIR.put("onToHsv", Pair.of(Mode.HSV, Channel.ALL));
+        ACTION_TO_PAIR.put("onToHsvHue", Pair.of(Mode.HSV, Channel.FIRST));
+        ACTION_TO_PAIR.put("onToHsvSaturation", Pair.of(Mode.HSV, Channel.SECOND));
+        ACTION_TO_PAIR.put("onToHsvValue", Pair.of(Mode.HSV, Channel.THIRD));
 
-        MODE_TO_FUNC.put("onYCbCr601", Pair.of(Mode.YCBCR601, Channel.ALL));
-        MODE_TO_FUNC.put("Y601", Pair.of(Mode.YCBCR601, Channel.FIRST));
-        MODE_TO_FUNC.put("Cb601", Pair.of(Mode.YCBCR601, Channel.SECOND));
-        MODE_TO_FUNC.put("Cr601", Pair.of(Mode.YCBCR601, Channel.THIRD));
+        ACTION_TO_PAIR.put("onYCbCr601", Pair.of(Mode.YCBCR601, Channel.ALL));
+        ACTION_TO_PAIR.put("Y601", Pair.of(Mode.YCBCR601, Channel.FIRST));
+        ACTION_TO_PAIR.put("Cb601", Pair.of(Mode.YCBCR601, Channel.SECOND));
+        ACTION_TO_PAIR.put("Cr601", Pair.of(Mode.YCBCR601, Channel.THIRD));
 
-        MODE_TO_FUNC.put("onYCbCr709", Pair.of(Mode.YCBCR709, Channel.ALL));
-        MODE_TO_FUNC.put("Y709", Pair.of(Mode.YCBCR709, Channel.FIRST));
-        MODE_TO_FUNC.put("Cb709", Pair.of(Mode.YCBCR709, Channel.SECOND));
-        MODE_TO_FUNC.put("Cr709", Pair.of(Mode.YCBCR709, Channel.THIRD));
+        ACTION_TO_PAIR.put("onYCbCr709", Pair.of(Mode.YCBCR709, Channel.ALL));
+        ACTION_TO_PAIR.put("Y709", Pair.of(Mode.YCBCR709, Channel.FIRST));
+        ACTION_TO_PAIR.put("Cb709", Pair.of(Mode.YCBCR709, Channel.SECOND));
+        ACTION_TO_PAIR.put("Cr709", Pair.of(Mode.YCBCR709, Channel.THIRD));
 
-        MODE_TO_FUNC.put("onYCoCg", Pair.of(Mode.YCOCG, Channel.ALL));
-        MODE_TO_FUNC.put("onY", Pair.of(Mode.YCOCG, Channel.FIRST));
-        MODE_TO_FUNC.put("onCo", Pair.of(Mode.YCOCG, Channel.SECOND));
-        MODE_TO_FUNC.put("onCg", Pair.of(Mode.YCOCG, Channel.THIRD));
+        ACTION_TO_PAIR.put("onYCoCg", Pair.of(Mode.YCOCG, Channel.ALL));
+        ACTION_TO_PAIR.put("onY", Pair.of(Mode.YCOCG, Channel.FIRST));
+        ACTION_TO_PAIR.put("onCo", Pair.of(Mode.YCOCG, Channel.SECOND));
+        ACTION_TO_PAIR.put("onCg", Pair.of(Mode.YCOCG, Channel.THIRD));
 
-        MODE_TO_FUNC.put("onCmy", Pair.of(Mode.CMY, Channel.ALL));
-        MODE_TO_FUNC.put("onCmyC", Pair.of(Mode.CMY, Channel.FIRST));
-        MODE_TO_FUNC.put("onCmyM", Pair.of(Mode.CMY, Channel.SECOND));
-        MODE_TO_FUNC.put("onCmyY", Pair.of(Mode.CMY, Channel.THIRD));
+        ACTION_TO_PAIR.put("onCmy", Pair.of(Mode.CMY, Channel.ALL));
+        ACTION_TO_PAIR.put("onCmyC", Pair.of(Mode.CMY, Channel.FIRST));
+        ACTION_TO_PAIR.put("onCmyM", Pair.of(Mode.CMY, Channel.SECOND));
+        ACTION_TO_PAIR.put("onCmyY", Pair.of(Mode.CMY, Channel.THIRD));
 
-        return MODE_TO_FUNC;
+        return ACTION_TO_PAIR;
     }
 
     @FXML
@@ -109,9 +119,14 @@ public class MainController {
         writeOnImageView(imageView, this.mode, this.channel);
     }
 
+    private void draw(Picture picture, Mode mode) {
+        writeOnImageView(firstChannel, mode, Channel.FIRST);
+        writeOnImageView(secondChannel, mode, Channel.SECOND);
+        writeOnImageView(thirdChannel, mode, Channel.THIRD);
+        writeOnImageView(imageView, mode, Channel.ALL);
+    }
+
     private void draw(Picture picture, Mode mode, Channel channel) {
-        this.mode = mode;
-        this.channel = channel;
         if (channel.equals(Channel.ALL)) {
             draw(picture, mode);
             return;
@@ -123,30 +138,67 @@ public class MainController {
         writeOnImageView(imageView, mode, channel);
     }
 
-    private void draw(Picture picture, Mode mode) {
+    private void writeOnImageView(ImageView view, Mode mode, Channel channel) {
+        /*WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
+        WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
+
+        Picture copyPicture = new PicturePNM();
+        copyPicture.setMode(this.mode);
+        copyPicture.setChannel(this.channel);
+
+        Pixel[] pixelData = picture.getPixelData();
+
+        Pixel[] pixelsCopy = new Pixel[pixelData.length];
+        for (int i = 0; i < pixelData.length; i++) {
+            pixelsCopy[i] = new Pixel(pixelData[i].getFirst(),
+                    pixelData[i].getSecond(),
+                    pixelData[i].getThird());
+        }
+
+        copyPicture.setPixelData(pixelsCopy);
+        pixelsCopy = copyPicture.getArgb(this.mode, this.channel); //rgb normalized
+
+        //gama converted rgb
+        pixelsCopy = GammaCorrection.convertGamma(pixelsCopy, curGamma, interpretGamma);
+
+        copyPicture.setPixelData(pixelsCopy);
+
         this.mode = mode;
-        writeOnImageView(firstChannel, mode, Channel.FIRST);
-        writeOnImageView(secondChannel, mode, Channel.SECOND);
-        writeOnImageView(thirdChannel, mode, Channel.THIRD);
-        writeOnImageView(imageView, mode, Channel.ALL);
-    }
+        this.channel = channel;
 
-    private void convertGamma(Picture picture, double newGamma){
 
-    }
 
-    private void assignGamma(double gamma){
-        curGamma = gamma;
-    }
+        image.getPixelWriter().setPixels(0, 0,
+                picture.getWidth(), picture.getHeight(),
+                format, copyPicture.getIntArgb(mode, channel),
+                0, picture.getWidth());
+        view.setImage(image);*/
 
-    private void writeOnImageView(ImageView view,Mode mode, Channel channel) {
         this.mode = mode;
         this.channel = channel;
         WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
         WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
+
+        Picture copyPicture = new PicturePNM();
+        copyPicture.setMode(this.mode);
+        copyPicture.setChannel(this.channel);
+
+        Pixel[] pixelData = picture.getPixelData();
+
+        Pixel[] pixelsCopy = new Pixel[pixelData.length];
+        for (int i = 0; i < pixelData.length; i++) {
+            pixelsCopy[i] = new Pixel(pixelData[i].getFirst(),
+                    pixelData[i].getSecond(),
+                    pixelData[i].getThird());
+        }
+
+        pixelsCopy = GammaCorrection.convertGamma(pixelsCopy, curGamma, interpretGamma);
+
+        copyPicture.setPixelData(pixelsCopy);
+
         image.getPixelWriter().setPixels(0, 0,
                 picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(this.curGamma, mode, channel),
+                format, copyPicture.getIntArgb(mode, channel),
                 0, picture.getWidth());
         view.setImage(image);
     }
@@ -197,16 +249,16 @@ public class MainController {
         firstChannel.setImage(null);
         secondChannel.setImage(null);
         thirdChannel.setImage(null);
-        this.curGamma = 1.0;
+        this.curGamma = 0.0;
+        this.interpretGamma = 0.0;
     }
 
-    public void onGamma(ActionEvent actionEvent) {
-        showGammaInputDialog(new Stage());
-        System.out.println(curGamma);
+    public void onAssignGamma(ActionEvent actionEvent) {
+        showAssignGammaInputDialog(new Stage());
     }
 
-    private void showGammaInputDialog(Stage primaryStage) {
-        TextInputDialog dialog = new TextInputDialog("1.0");
+    private void showAssignGammaInputDialog(Stage primaryStage) {
+        TextInputDialog dialog = new TextInputDialog("0.0");
         dialog.setTitle("Ввод гаммы");
         dialog.setHeaderText("Введите значение гаммы (от 0.0 до 128.0):");
         dialog.setContentText("Гамма:");
@@ -215,9 +267,67 @@ public class MainController {
             try {
                 double gammaValue = Double.parseDouble(gamma);
                 if (gammaValue >= 0.0 && gammaValue <= 128.0) {
-                    System.out.println("Гамма " + gammaValue);
-                    this.curGamma = gammaValue;
-                    draw(this.picture);
+
+                    interpretGamma = gammaValue;
+                    draw(picture, mode, channel);
+
+                    /*
+                    Mode prevMode = this.mode;
+                    Channel prevChannel = this.channel;
+                    Pixel[] pixels = picture.getArgb(mode, channel);
+                    Pixel[] pixelsBefore = new Pixel[pixels.length];
+                    for (int i = 0; i < pixels.length; i++) {
+                        pixelsBefore[i] = new Pixel(pixels[i].getFirst(),
+                                pixels[i].getSecond(),
+                                pixels[i].getThird());
+                    }
+
+                    this.picture.setPixelData(
+                            GammaCorrection.convertGamma(pixels, curGamma, gammaValue));
+
+                    draw(this.picture, prevMode, prevChannel);
+                    this.mode = prevMode;
+                    this.channel = prevChannel;
+                    this.picture.setPixelData(pixelsBefore);*/
+                } else {
+                    System.out.println("Неверное значение гаммы. Значение должно быть в диапазоне от 0.0 до 128.0.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка при парсинге значения гаммы.");
+            }
+        });
+    }
+
+    public void onConvertGamma(ActionEvent actionEvent){
+        showConvertGammaInputDialog(new Stage());
+    }
+
+    private void showConvertGammaInputDialog(Stage primaryStage){
+        TextInputDialog dialog = new TextInputDialog("0.0");
+        dialog.setTitle("Ввод гаммы");
+        dialog.setHeaderText("Введите значение гаммы (от 0.0 до 128.0):");
+        dialog.setContentText("Гамма:");
+
+        dialog.showAndWait().ifPresent(gamma -> {
+            try {
+                double newGamma = Double.parseDouble(gamma);
+                if (newGamma >= 0.0 && newGamma <= 128.0) {
+
+                    Mode prevMode = this.mode;
+                    Channel prevChannel = this.channel;
+                    Pixel[] pixels = picture.getArgb(mode, channel);
+
+                    this.picture.setPixelData(
+                            GammaCorrection.convertGamma(pixels, curGamma, newGamma));
+
+                    this.picture.setPixelData(RGB_TO_OTHER.get(prevMode).apply(this.picture.getPixelData(), Channel.ALL));
+                    this.picture.setMode(prevMode);
+                    this.mode = prevMode;
+                    this.channel = prevChannel;
+                    this.curGamma = newGamma;
+
+                    draw(this.picture, this.mode, this.channel);
+
                 } else {
                     System.out.println("Неверное значение гаммы. Значение должно быть в диапазоне от 0.0 до 128.0.");
                 }

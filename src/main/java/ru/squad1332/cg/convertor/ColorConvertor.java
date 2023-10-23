@@ -32,7 +32,6 @@ public class ColorConvertor {
     }
 
     public static Pixel[] convertRgbToHsl(Pixel[] pixelData, Channel channel) {
-        System.out.println("HSL ");
         Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];

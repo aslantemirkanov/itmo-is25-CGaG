@@ -7,6 +7,7 @@ import java.io.File;
 
 public interface Picture {
     Pixel[] getPixelData();
+    void setPixelData(Pixel[] pixelData);
 
     String getFormatType();
 
@@ -20,12 +21,14 @@ public interface Picture {
 
     void writeToFile(File file, Mode mode, Channel channel);
 
-    int[] getIntArgb();
-    int[] getIntArgb(double gamma);
-
     void setMode(Mode mode);
+
     void setChannel(Channel channel);
 
 
-    int[] getIntArgb(double curGamma, Mode mode, Channel channel);
+    int[] getIntArgb(Mode mode, Channel channel);
+
+    Pixel[] getArgb(Mode mode, Channel channel);
+
+    Mode getMode();
 }
