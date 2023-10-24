@@ -20,9 +20,9 @@ public interface Picture {
 
     void setPath(String path);
 
-    void writeToFile(File file, Mode mode, Channel channel, double curGamma);
+    void writeToFile(File file, Mode mode, Channel channel, double curGamma, Object dither, int bit);
 
-    int[] getIntArgb(Mode curMode, Channel curChannel, Mode mode, Channel channel, double curGamma, double interpretGamma);
+    int[] getIntArgb(Mode curMode, Channel curChannel, Mode mode, Channel channel, double curGamma, double interpretGamma, String choice, int bit);
 
 
     Pixel[] applyGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel);

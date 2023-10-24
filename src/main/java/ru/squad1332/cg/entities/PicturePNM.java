@@ -2,6 +2,7 @@ package ru.squad1332.cg.entities;
 
 
 import ru.squad1332.cg.convertor.ColorConvertor;
+import ru.squad1332.cg.dither.DitheringService;
 import ru.squad1332.cg.gamma.GammaCorrection;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
@@ -10,7 +11,6 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -106,7 +106,7 @@ public class PicturePNM implements Picture {
     }
 
     @Override
-    public void writeToFile(File file, Mode mode, Channel channel, double curGamma) {
+    public void writeToFile(File file, Mode mode, Channel channel, double curGamma, Object dither, int bit) {
         try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
 /*
             Pixel[] pixelsData = new Pixel[this.pixelData.length];
@@ -143,6 +143,9 @@ public class PicturePNM implements Picture {
                     dataOutputStream.write(pixels);
                     dataOutputStream.close();
                 }*/
+            if (dither != null) {
+                DitheringService.applyDithering(pixelData, (String) dither, bit, width, height);
+            }
             pixelData = RGB_TO_OTHER.get(mode).apply(pixelData, channel);
             if (channel.equals(Channel.ALL)) {
                 dataOutputStream.writeBytes(formatType + (char) (10));
@@ -200,13 +203,13 @@ public class PicturePNM implements Picture {
     }
 
     @Override
-    public int[] getIntArgb(Mode curMode, Channel curChannel, Mode mode, Channel channel, double curGamma, double interpretGamma) {
+    public int[] getIntArgb(Mode curMode, Channel curChannel, Mode mode, Channel channel, double curGamma, double interpretGamma, String choice, int bit) {
         System.out.println("Режим картинки " + curMode + " " + curChannel);
         System.out.println("Режим текущий " + mode + " " + channel);
 
         int[] intRgba = new int[pixelData.length];
 
-        Pixel[] pixels = pixelConversion(curMode, curChannel, mode, channel, curGamma, interpretGamma);
+        Pixel[] pixels = pixelConversion(curMode, curChannel, mode, channel, curGamma, interpretGamma, choice, bit);
 
         //pixels = applyGamma(pixels, curGamma, interpretGamma, mode, channel);
 
@@ -223,7 +226,7 @@ public class PicturePNM implements Picture {
 
 
     public Pixel[] pixelConversion(Mode curMode, Channel curChannel, Mode mode, Channel channel, double curGamma,
-                                   double newGamma) {
+                                   double newGamma, String choice, int bit) {
         Pixel[] copy = new Pixel[this.pixelData.length];
         for (int i = 0; i < this.pixelData.length; i++) {
             copy[i] = new Pixel(this.pixelData[i].getFirst(),
@@ -231,6 +234,9 @@ public class PicturePNM implements Picture {
                     this.pixelData[i].getThird());
         }
 
+        if (choice != null) {
+            DitheringService.applyDithering(copy, choice, bit, width, height);
+        }
 
         copy = applyGamma(copy, curGamma, newGamma, mode, channel);
         copy = RGB_TO_OTHER.get(mode).apply(copy, channel);

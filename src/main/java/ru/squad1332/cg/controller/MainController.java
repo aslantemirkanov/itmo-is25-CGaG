@@ -18,10 +18,11 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Pair;
+import ru.squad1332.cg.dither.DitheringService;
 import ru.squad1332.cg.draw.Wu;
 import ru.squad1332.cg.entities.Picture;
-import ru.squad1332.cg.entities.Pixel;
 import ru.squad1332.cg.entities.PicturePNM;
+import ru.squad1332.cg.entities.Pixel;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.services.PictureService;
@@ -131,7 +132,7 @@ public class MainController {
             this.file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
             if (this.file != null) {
                 picture = pictureService.openPicture(this.file.getPath());
-                picture.setPixelData(PicturePNM.OTHER_TO_RGB.get(mode).apply(picture.getPixelData(),channel));
+                picture.setPixelData(PicturePNM.OTHER_TO_RGB.get(mode).apply(picture.getPixelData(), channel));
                 draw(picture);
             }
         } catch (Throwable e) {
@@ -142,6 +143,21 @@ public class MainController {
 
     private void draw(Picture picture) {
         writeOnImageView(canvas, this.mode, this.channel);
+    }
+
+    private void draw(Picture picture, String choice, int bit) {
+        writeOnImageView(canvas, mode, this.channel, choice, bit);
+    }
+
+    private void writeOnImageView(Canvas canvas, Mode mode, Channel channel, String choice, int bit) {
+        canvas.setWidth(picture.getWidth());
+        canvas.setHeight(picture.getHeight());
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
+        gc.getPixelWriter().setPixels(0, 0,
+                picture.getWidth(), picture.getHeight(),
+                format, picture.getIntArgb(this.mode, this.channel, mode, channel, curGamma, interpretGamma, choice, bit),
+                0, picture.getWidth());
     }
 
     private void draw(Picture picture, Mode mode, Channel channel) {
@@ -175,20 +191,14 @@ public class MainController {
 
         image.getPixelWriter().setPixels(0, 0,
                 picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(this.mode, this.channel, mode, channel, curGamma, interpretGamma),
+                format, picture.getIntArgb(this.mode, this.channel, mode, channel, curGamma, interpretGamma, null, 0),
                 0, picture.getWidth());
         view.setImage(image);
     }
-//Todo посмотреть
+    //Todo посмотреть
+
     private void writeOnImageView(Canvas canvas, Mode mode, Channel channel) {
-        canvas.setWidth(picture.getWidth());
-        canvas.setHeight(picture.getHeight());
-        GraphicsContext gc = canvas.getGraphicsContext2D();
-        WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
-        gc.getPixelWriter().setPixels(0, 0,
-                picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(this.mode, this.channel, mode, channel, curGamma, interpretGamma),
-                0, picture.getWidth());
+        writeOnImageView(canvas, mode, channel, null, 0);
     }
 
 
@@ -201,7 +211,7 @@ public class MainController {
             fileChooser.setTitle("Выберите файл");
             File selectedFile = fileChooser.showSaveDialog(canvas.getScene().getWindow());
             if (selectedFile != null) {
-                picture.writeToFile(selectedFile, this.mode, this.channel, curGamma);
+                picture.writeToFile(selectedFile, this.mode, this.channel, curGamma, this.ditherModeComboBox.getValue(), (int)this.bitSlider.getValue());
             }
         } catch (Throwable e) {
             System.out.println(e.getMessage());
@@ -270,7 +280,7 @@ public class MainController {
     }
 
     public void onDrawLine(ActionEvent actionEvent) {
-        imagesViews.setVisible(false);
+        hideAll();
         lineForm.setVisible(true);
         canvas.setCursor(Cursor.CROSSHAIR);
     }
@@ -320,11 +330,11 @@ public class MainController {
                 "Random",
                 "Floyd-Steinberg",
                 "Atkinson");
-        ditherModeComboBox.setValue("Ordered");
         lineWidthSlider.setValue(2);
         lineWidthSlider.setValue(1);
         transparencySlider.setValue(1);
     }
+
     private void showConvertGammaInputDialog(Stage primaryStage) {
         TextInputDialog dialog = new TextInputDialog("0.0");
         dialog.setTitle("Ввод гаммы");
@@ -349,11 +359,21 @@ public class MainController {
     }
 
     public void applyDithering(ActionEvent actionEvent) {
-        String  choice = (String)ditherModeComboBox.getValue();
+        String choice = (String) ditherModeComboBox.getValue();
         System.out.println(choice);
+        int bit = (int) this.bitSlider.getValue();
+        draw(picture, choice, bit);
     }
 
     public void onDithering(ActionEvent actionEvent) {
+        hideAll();
+        ditherForm.setVisible(true);
 
+    }
+
+    private void hideAll() {
+        ditherForm.setVisible(false);
+        lineForm.setVisible(false);
+        imagesViews.setVisible(false);
     }
 }
