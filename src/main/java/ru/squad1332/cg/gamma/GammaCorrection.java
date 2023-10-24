@@ -13,7 +13,7 @@ public class GammaCorrection {
         return pixelData;
     }
 
-    private static Pixel[] removeGamma(Pixel[] pixelData, double gamma) {
+    public static Pixel[] removeGamma(Pixel[] pixelData, double gamma) {
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             double r = color.getFirst();
@@ -32,7 +32,7 @@ public class GammaCorrection {
         return pixelData;
     }
 
-    private static Pixel[] assignGamma(Pixel[] pixelData, double gamma) {
+    public static Pixel[] assignGamma(Pixel[] pixelData, double gamma) {
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             double r = color.getFirst();
@@ -51,7 +51,7 @@ public class GammaCorrection {
         return pixelData;
     }
 
-    private static double srgbToLineal(double channel) {
+    public static double srgbToLineal(double channel) {
         double res;
         if (channel <= 0.04045) {
             res = channel / 12.92;
@@ -61,7 +61,7 @@ public class GammaCorrection {
         return res;
     }
 
-    private static double linealToSRGB(double channel) {
+    public static double linealToSRGB(double channel) {
         double res;
         if (channel <= 0.0031308) {
             res = channel * 12.92;

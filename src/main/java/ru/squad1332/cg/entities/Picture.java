@@ -22,16 +22,15 @@ public interface Picture {
 
     void writeToFile(File file, Mode mode, Channel channel);
 
-    int[] getIntArgb();
-
     void setMode(Mode mode);
 
     void setChannel(Channel channel);
 
-
-    int[] getIntArgb(Mode mode, Channel channel);
-
-    Pixel[] getArgb(Mode mode, Channel channel);
+    int[] getIntArgb(Mode curMode, Channel curChannel, Mode mode, Channel channel, double curGamma, double interpretGamma);
 
     Mode getMode();
+
+    Pixel[] applyGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel);
+
+    Pixel[] convertGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel);
 }

@@ -53,7 +53,6 @@ public class PicturePNM implements Picture {
     private Pixel[] pixelData;
     private Mode mode = Mode.RGB;
     private Channel channel = Channel.ALL;
-    private double gamma = 0;
 
 
     public String getFormatType() {
@@ -111,9 +110,17 @@ public class PicturePNM implements Picture {
     @Override
     public void writeToFile(File file, Mode mode, Channel channel) {
         try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
-            Pixel[] pixelsData = Arrays.copyOf(this.pixelData, this.pixelData.length);
+
+            Pixel[] pixelsData = new Pixel[this.pixelData.length];
+            for (int i = 0; i < this.pixelData.length; i++) {
+                pixelsData[i] = new Pixel(this.pixelData[i].getFirst(),
+                        this.pixelData[i].getSecond(),
+                        this.pixelData[i].getThird());
+            }
+
             pixelsData = OTHER_TO_RGB.get(this.mode).apply(pixelsData, this.channel);
             pixelsData = RGB_TO_OTHER.get(mode).apply(pixelsData, channel);
+
             if (channel.equals(Channel.ALL)) {
                 dataOutputStream.writeBytes(formatType + (char) (10));
                 dataOutputStream.writeBytes(String.valueOf(width) + (char) (32) + String.valueOf(height) + (char) (10));
@@ -169,24 +176,15 @@ public class PicturePNM implements Picture {
         }
     }
 
-
-
     @Override
-    public int[] getIntArgb() {
-        return getIntArgb(this.mode, this.channel);
-    }
-
-    @Override
-    public int[] getIntArgb(Mode mode, Channel channel) {
-        System.out.println("Режим картинки " + this.mode + " " + this.channel);
+    public int[] getIntArgb(Mode curMode, Channel curChannel, Mode mode, Channel channel, double curGamma, double interpretGamma) {
+        System.out.println("Режим картинки " + curMode + " " + curChannel);
         System.out.println("Режим текущий " + mode + " " + channel);
 
         int[] intRgba = new int[pixelData.length];
-        Pixel[] pixels = pixelConversion(mode, channel);
-        Pixel[] pixels = OTHER_TO_RGB.get(this.mode).apply(this.pixelData, this.channel);
+        Pixel[] pixels = pixelConversion(curMode, curChannel, mode, channel);
 
-        pixels = RGB_TO_OTHER.get(mode).apply(pixels, channel);
-        pixels = OTHER_TO_RGB.get(mode).apply(pixels, channel);
+        pixels = applyGamma(pixels, curGamma, interpretGamma, mode, channel);
 
         for (int i = 0; i < pixels.length; i++) {
             double[] rgba = pixels[i].getColors();
@@ -199,15 +197,58 @@ public class PicturePNM implements Picture {
         return intRgba;
     }
 
-    private Pixel[] pixelConversion(Mode mode, Channel channel) {
-        Pixel[] copy = Arrays.copyOf(this.pixelData, this.pixelData.length);
-        System.out.println("COPY");
-        copy = OTHER_TO_RGB.get(this.mode).apply(copy, this.channel);
-        System.out.println("RGB");
+
+    public Pixel[] pixelConversion(Mode curMode, Channel curChannel, Mode mode, Channel channel) {
+        Pixel[] copy = new Pixel[this.pixelData.length];
+        for (int i = 0; i < this.pixelData.length; i++) {
+            copy[i] = new Pixel(this.pixelData[i].getFirst(),
+                    this.pixelData[i].getSecond(),
+                    this.pixelData[i].getThird());
+        }
+
+        copy = OTHER_TO_RGB.get(curMode).apply(copy, curChannel);
+
         copy = RGB_TO_OTHER.get(mode).apply(copy, channel);
         System.out.println("OTHER");
         copy = OTHER_TO_RGB.get(mode).apply(copy, channel);
         System.out.println("RGB AGAIN");
+        return copy;
+    }
+
+    public Pixel[] applyGamma(Pixel[] pixelData, double curGamma, double newGamma,
+                              Mode curMode, Channel curChannel) {
+
+        if (curGamma == newGamma) {
+            return pixelData;
+        }
+
+        Pixel[] copy = new Pixel[pixelData.length];
+        for (int i = 0; i < pixelData.length; i++) {
+            copy[i] = new Pixel(pixelData[i].getFirst(),
+                    pixelData[i].getSecond(),
+                    pixelData[i].getThird());
+        }
+
+        //copy = OTHER_TO_RGB.get(curMode).apply(copy, curChannel);
+        GammaCorrection.removeGamma(copy, curGamma);
+        GammaCorrection.assignGamma(copy, newGamma);
+        //copy = RGB_TO_OTHER.get(curMode).apply(copy, curChannel);
+
+        System.out.println("INTERPRET GAMMA = " + newGamma + " APPLY");
+        return copy;
+    }
+
+    public Pixel[] convertGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel){
+
+        if (curGamma == newGamma) {
+            return pixelData;
+        }
+
+        Pixel[] copy = pixelConversion(mode, channel, curMode, curChannel);
+        GammaCorrection.removeGamma(copy, curGamma);
+        GammaCorrection.assignGamma(copy, newGamma);
+
+        System.out.println("INTERPRET GAMMA = " + newGamma + " APPLY");
         return copy;
     }
 

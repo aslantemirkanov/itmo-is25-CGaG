@@ -32,7 +32,7 @@ import static ru.squad1332.cg.entities.PicturePNM.RGB_TO_OTHER;
 
 public class MainController {
     private static final double scale = 1.05;
-    private static final Map<String, Pair<Mode, Channel>> MODE_TO_FUNC = getMapModeChannel();
+    private static final Map<String, Pair<Mode, Channel>> ACTION_TO_PAIR = getMapModeChannel();
     @FXML
     private ImageView firstChannel;
     @FXML
@@ -53,7 +53,6 @@ public class MainController {
 
     private double interpretGamma = 0.0;
     private double curGamma = 0.0;
-
 
 
     private static Map<String, Pair<Mode, Channel>> getMapModeChannel() {
@@ -105,7 +104,7 @@ public class MainController {
             FileChooser fileChooser = new FileChooser();
             this.file = fileChooser.showOpenDialog(imageView.getScene().getWindow());
             if (this.file != null) {
-                this.picture = pictureService.openPicture(this.file.getPath(), this.mode, this.channel);
+                picture = pictureService.openPicture(this.file.getPath(), this.mode, this.channel);
                 draw(picture);
             }
         } catch (Throwable e) {
@@ -121,51 +120,29 @@ public class MainController {
     private void draw(Picture picture, Mode mode, Channel channel) {
         if (channel.equals(Channel.ALL)) {
             draw(picture, mode);
-            return;
         } else {
             firstChannel.setImage(null);
             secondChannel.setImage(null);
             thirdChannel.setImage(null);
+            writeOnImageView(imageView, mode, channel);
         }
-        writeOnImageView(imageView, mode, channel);
+
     }
 
     private void draw(Picture picture, Mode mode) {
-        this.mode = mode;
         writeOnImageView(firstChannel, mode, Channel.FIRST);
         writeOnImageView(secondChannel, mode, Channel.SECOND);
         writeOnImageView(thirdChannel, mode, Channel.THIRD);
         writeOnImageView(imageView, mode, Channel.ALL);
     }
 
-
     private void writeOnImageView(ImageView view, Mode mode, Channel channel) {
-        this.mode = mode;
-        this.channel = channel;
         WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
         WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
 
-/*        Picture copyPicture = new PicturePNM();
-        copyPicture.setMode(this.mode);
-        copyPicture.setChannel(this.channel);
-
-        Pixel[] pixelData = picture.getPixelData();
-
-        Pixel[] pixelsCopy = new Pixel[pixelData.length];
-        for (int i = 0; i < pixelData.length; i++) {
-            pixelsCopy[i] = new Pixel(pixelData[i].getFirst(),
-                    pixelData[i].getSecond(),
-                    pixelData[i].getThird());
-        }
-
-        pixelsCopy = GammaCorrection.convertGamma(pixelsCopy, curGamma, interpretGamma);
-
-        copyPicture.setPixelData(pixelsCopy);*/
-
         image.getPixelWriter().setPixels(0, 0,
                 picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(mode, channel),
-                //format, copyPicture.getIntArgb(mode, channel),
+                format, picture.getIntArgb(this.mode, this.channel, mode, channel, curGamma, interpretGamma),
                 0, picture.getWidth());
         view.setImage(image);
     }
@@ -187,13 +164,12 @@ public class MainController {
         }
     }
 
-
     @FXML
     protected void colorConvertor(ActionEvent event) {
         MenuItem menuItem = (MenuItem) event.getSource();
         String format = menuItem.getId();
 
-        draw(this.picture, ACTION_TO_PAIR.get(format).getLeft(), MODE_TO_FUNC.get(format).getRight());
+        draw(this.picture, ACTION_TO_PAIR.get(format).getLeft(), ACTION_TO_PAIR.get(format).getRight());
     }
 
     public void handleScroll(ScrollEvent event) {
@@ -234,28 +210,9 @@ public class MainController {
             try {
                 double gammaValue = Double.parseDouble(gamma);
                 if (gammaValue >= 0.0 && gammaValue <= 128.0) {
-
                     interpretGamma = gammaValue;
+
                     draw(picture, mode, channel);
-
-                    /*
-                    Mode prevMode = this.mode;
-                    Channel prevChannel = this.channel;
-                    Pixel[] pixels = picture.getArgb(mode, channel);
-                    Pixel[] pixelsBefore = new Pixel[pixels.length];
-                    for (int i = 0; i < pixels.length; i++) {
-                        pixelsBefore[i] = new Pixel(pixels[i].getFirst(),
-                                pixels[i].getSecond(),
-                                pixels[i].getThird());
-                    }
-
-                    this.picture.setPixelData(
-                            GammaCorrection.convertGamma(pixels, curGamma, gammaValue));
-
-                    draw(this.picture, prevMode, prevChannel);
-                    this.mode = prevMode;
-                    this.channel = prevChannel;
-                    this.picture.setPixelData(pixelsBefore);*/
                 } else {
                     System.out.println("Неверное значение гаммы. Значение должно быть в диапазоне от 0.0 до 128.0.");
                 }
@@ -265,11 +222,11 @@ public class MainController {
         });
     }
 
-    public void onConvertGamma(ActionEvent actionEvent){
+    public void onConvertGamma(ActionEvent actionEvent) {
         showConvertGammaInputDialog(new Stage());
     }
 
-    private void showConvertGammaInputDialog(Stage primaryStage){
+    private void showConvertGammaInputDialog(Stage primaryStage) {
         TextInputDialog dialog = new TextInputDialog("0.0");
         dialog.setTitle("Ввод гаммы");
         dialog.setHeaderText("Введите значение гаммы (от 0.0 до 128.0):");
@@ -279,22 +236,10 @@ public class MainController {
             try {
                 double newGamma = Double.parseDouble(gamma);
                 if (newGamma >= 0.0 && newGamma <= 128.0) {
+                    picture.setPixelData(picture.convertGamma(picture.getPixelData(), curGamma, newGamma, mode, channel));
 
-                    Mode prevMode = this.mode;
-                    Channel prevChannel = this.channel;
-                    Pixel[] pixels = picture.getArgb(mode, channel);
-
-                    this.picture.setPixelData(
-                            GammaCorrection.convertGamma(pixels, curGamma, newGamma));
-
-                    this.picture.setPixelData(RGB_TO_OTHER.get(prevMode).apply(this.picture.getPixelData(), Channel.ALL));
-                    this.picture.setMode(prevMode);
-                    this.mode = prevMode;
-                    this.channel = prevChannel;
-                    this.curGamma = newGamma;
-
-                    draw(this.picture, this.mode, this.channel);
-
+                    curGamma = newGamma;
+                    draw(picture, mode, channel);
                 } else {
                     System.out.println("Неверное значение гаммы. Значение должно быть в диапазоне от 0.0 до 128.0.");
                 }
