@@ -5,10 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Slider;
+import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelFormat;
 import javafx.scene.image.WritableImage;
@@ -19,6 +16,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Pair;
 import ru.squad1332.cg.draw.Wu;
 import ru.squad1332.cg.entities.Picture;
@@ -52,7 +50,7 @@ public class MainController {
     public Label lineWidthLabel;
     @FXML
     public Label transparencyLabel;
-    private List<double[]> pickedPixels = new ArrayList<double[]>();
+    private List<double[]> pickedPixels = new ArrayList<>();
     @FXML
     private ImageView firstChannel;
     @FXML
@@ -175,15 +173,13 @@ public class MainController {
     }
 //Todo посмотреть
     private void writeOnImageView(Canvas canvas, Mode mode, Channel channel) {
-        this.mode = mode;
-        this.channel = channel;
         canvas.setWidth(picture.getWidth());
         canvas.setHeight(picture.getHeight());
         GraphicsContext gc = canvas.getGraphicsContext2D();
         WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
         gc.getPixelWriter().setPixels(0, 0,
                 picture.getWidth(), picture.getHeight(),
-                format, picture.getIntArgb(mode, channel),
+                format, picture.getIntArgb(this.mode, this.channel, mode, channel, curGamma, interpretGamma),
                 0, picture.getWidth());
     }
 
