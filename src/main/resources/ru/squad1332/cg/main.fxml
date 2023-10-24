@@ -80,6 +80,10 @@
                         <MenuItem fx:id="onCmyY" mnemonicParsing="false" onAction="#colorConvertor" text="Y"/>
                     </items>
                 </Menu>
+                <MenuItem mnemonicParsing="false" text="Assign Gamma" onAction="#onAssignGamma">
+                </MenuItem>
+                <MenuItem mnemonicParsing="false" text="Convert Gamma" onAction="#onConvertGamma">
+                </MenuItem>
             </Menu>
             <Menu mnemonicParsing="false" text="Фигуры">
                 <items>

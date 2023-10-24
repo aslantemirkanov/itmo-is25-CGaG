@@ -8,6 +8,8 @@ import java.io.File;
 public interface Picture {
     Pixel[] getPixelData();
 
+    void setPixelData(Pixel[] pixelData);
+
     String getFormatType();
 
     int getWidth();
@@ -18,13 +20,12 @@ public interface Picture {
 
     void setPath(String path);
 
-    void writeToFile(File file, Mode mode, Channel channel);
+    void writeToFile(File file, Mode mode, Channel channel, double curGamma);
 
-    int[] getIntArgb();
-
-    void setMode(Mode mode);
-    void setChannel(Channel channel);
+    int[] getIntArgb(Mode curMode, Channel curChannel, Mode mode, Channel channel, double curGamma, double interpretGamma);
 
 
-    int[] getIntArgb(Mode mode, Channel channel);
+    Pixel[] applyGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel);
+
+    //Pixel[] convertGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel);
 }

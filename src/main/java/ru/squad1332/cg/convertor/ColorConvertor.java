@@ -90,6 +90,7 @@ public class ColorConvertor {
     }
 
     public static Pixel[] convertHslToRgb(Pixel[] pixelData, Channel channel) {
+        Pixel[] result = new Pixel[pixelData.length];
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];
             pixelData[i] = convertHslToRgbOne(color);
@@ -192,7 +193,6 @@ public class ColorConvertor {
 
         return pixelData;
     }
-
 
     public static Pixel[] convertHsvToRgb(Pixel[] pixelData, Channel channel) {
         for (int i = 0; i < pixelData.length; i++) {

@@ -35,14 +35,25 @@ public class Pixel {
         return rgba[0];
     }
 
+    public void setFirst(double r) {
+        rgba[0] = r;
+    }
+
     public double getSecond() {
         return rgba[1];
+    }
+
+    public void setSecond(double g) {
+        rgba[1] = g;
     }
 
     public double getThird() {
         return rgba[2];
     }
 
+    public void setThird(double b) {
+        rgba[2] = b;
+    }
     public Pixel addOpacity(double c) {
         return new Pixel(getFirst() * c, getSecond() * c, getThird() * c);
     }
