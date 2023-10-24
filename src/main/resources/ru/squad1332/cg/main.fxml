@@ -84,6 +84,8 @@
                 </MenuItem>
                 <MenuItem mnemonicParsing="false" text="Convert Gamma" onAction="#onConvertGamma">
                 </MenuItem>
+                <MenuItem mnemonicParsing="false" text="Dithering" onAction="#onDithering">
+                </MenuItem>
             </Menu>
             <Menu mnemonicParsing="false" text="Фигуры">
                 <items>
@@ -129,6 +131,25 @@
                 </children>
             </HBox>
             <Button onAction="#drawLine" text="Draw Line" />
+        </children>
+    </VBox>
+
+    <VBox fx:id="ditherForm" visible="false" alignment="CENTER">
+        <children>
+            <HBox alignment="CENTER" spacing="10.0">
+                <children>
+                    <Text text="Mode:" />
+                    <ComboBox fx:id="ditherModeComboBox"/>
+                </children>
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+                <children>
+                    <Text text="Bit:" />
+                    <Slider fx:id="bitSlider" blockIncrement="1.0" max="10.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="false" />
+                    <Label fx:id="bitSliderLabel" />
+                </children>
+            </HBox>
+            <Button onAction="#applyDithering" text="Применить" />
         </children>
     </VBox>
 

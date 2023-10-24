@@ -50,6 +50,14 @@ public class MainController {
     public Label lineWidthLabel;
     @FXML
     public Label transparencyLabel;
+    @FXML
+    public VBox ditherForm;
+    @FXML
+    public Slider bitSlider;
+    @FXML
+    public Label bitSliderLabel;
+    @FXML
+    public ComboBox ditherModeComboBox;
     private List<double[]> pickedPixels = new ArrayList<>();
     @FXML
     private ImageView firstChannel;
@@ -275,13 +283,12 @@ public class MainController {
         int width = (int) this.lineWidthSlider.getValue();
         double transparency = this.transparencySlider.getValue();
         Pixel pixel = new Pixel(color);
-        System.out.println("COLOR = " + pixel.addOpacity(transparency));
         Wu.drawLine(this.picture.getPixelData(),
                 this.picture.getWidth(),
                 this.picture.getHeight(),
                 first[0], first[1],
                 second[0], second[1],
-                width, transparency, pixel.addOpacity(transparency));
+                width, transparency, pixel);
         System.out.println("Draw");
         draw(this.picture);
         pickedPixels = new ArrayList<>();
@@ -304,7 +311,16 @@ public class MainController {
         transparencySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             transparencyLabel.setText(String.format("%.2f", newValue));
         });
+        bitSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            int bit = (int) Math.round(newValue.doubleValue());
+            bitSliderLabel.setText(String.valueOf(bit));
+        });
 
+        ditherModeComboBox.getItems().addAll("Ordered",
+                "Random",
+                "Floyd-Steinberg",
+                "Atkinson");
+        ditherModeComboBox.setValue("Ordered");
         lineWidthSlider.setValue(2);
         lineWidthSlider.setValue(1);
         transparencySlider.setValue(1);
@@ -332,4 +348,12 @@ public class MainController {
         });
     }
 
+    public void applyDithering(ActionEvent actionEvent) {
+        String  choice = (String)ditherModeComboBox.getValue();
+        System.out.println(choice);
+    }
+
+    public void onDithering(ActionEvent actionEvent) {
+
+    }
 }
