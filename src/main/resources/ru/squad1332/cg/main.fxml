@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.text.Text?>
 <VBox xmlns:fx="http://javafx.com/fxml/1" alignment="TOP_CENTER" prefHeight="1000.0" prefWidth="1920.0"
       xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="ru.squad1332.cg.controller.MainController">
 
@@ -80,15 +81,20 @@
                     </items>
                 </Menu>
             </Menu>
+            <Menu mnemonicParsing="false" text="Фигуры">
+                <items>
+                    <MenuItem mnemonicParsing="false" onAction="#onDrawLine" text="Линия" />
+                </items>
+            </Menu>
         </menus>
     </MenuBar>
     <Label fx:id="filename" text="Выберите фото"/>
 
     <ScrollPane fx:id="scrollPane" maxHeight="1080" minHeight="150">
-        <Canvas fx:id="imageView" onScroll="#handleScroll" pickOnBounds="true"/>
+        <Canvas width="1080" height="150" fx:id="canvas" onScroll="#handleScroll" pickOnBounds="true" onMouseClicked="#pixelPicked"/>
     </ScrollPane>
 
-    <HBox>
+    <HBox fx:id="imagesViews" visible="false">
         <ImageView fx:id="firstChannel" fitHeight="150" fitWidth="250"  pickOnBounds="true"
                    preserveRatio="true"/>
         <ImageView fx:id="secondChannel" fitHeight="150" fitWidth="250"  pickOnBounds="true"
@@ -96,6 +102,31 @@
         <ImageView fx:id="thirdChannel" fitHeight="150" fitWidth="250"  pickOnBounds="true"
                    preserveRatio="true"/>
     </HBox>
+    <VBox fx:id="lineForm" visible="false" alignment="CENTER">
+        <children>
+            <HBox alignment="CENTER" spacing="10.0">
+                <children>
+                    <Text text="Line Width:" />
+                    <Slider fx:id="lineWidthSlider" blockIncrement="1.0" max="10.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="false" />
+                    <Label fx:id="lineWidthLabel" />
+                </children>
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+                <children>
+                    <Text text="Transparency:" />
+                    <Slider fx:id="transparencySlider" blockIncrement="0.1" max="1.0" min="0.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="false" />
+                    <Label fx:id="transparencyLabel" />
+                </children>
+            </HBox>
+            <HBox alignment="CENTER" spacing="10.0">
+                <children>
+                    <Text text="Color:" />
+                    <ColorPicker fx:id="colorPicker" />
+                </children>
+            </HBox>
+            <Button onAction="#drawLine" text="Draw Line" />
+        </children>
+    </VBox>
 
     <Label fx:id="errorMessage" textFill="RED"/>
 
