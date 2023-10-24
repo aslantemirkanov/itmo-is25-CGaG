@@ -15,20 +15,14 @@ import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Pair;
 import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;
-import ru.squad1332.cg.entities.Pixel;
-import ru.squad1332.cg.gamma.GammaCorrection;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.services.PictureService;
 
 import java.io.File;
 import java.nio.IntBuffer;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
-import static ru.squad1332.cg.entities.PicturePNM.OTHER_TO_RGB;
-import static ru.squad1332.cg.entities.PicturePNM.RGB_TO_OTHER;
 
 public class MainController {
     private static final double scale = 1.05;
@@ -104,7 +98,8 @@ public class MainController {
             FileChooser fileChooser = new FileChooser();
             this.file = fileChooser.showOpenDialog(imageView.getScene().getWindow());
             if (this.file != null) {
-                picture = pictureService.openPicture(this.file.getPath(), this.mode, this.channel);
+                picture = pictureService.openPicture(this.file.getPath());
+                picture.setPixelData(PicturePNM.OTHER_TO_RGB.get(mode).apply(picture.getPixelData(),channel));
                 draw(picture);
             }
         } catch (Throwable e) {
@@ -126,6 +121,8 @@ public class MainController {
             thirdChannel.setImage(null);
             writeOnImageView(imageView, mode, channel);
         }
+        this.mode = mode;
+        this.channel = channel;
 
     }
 
@@ -134,6 +131,7 @@ public class MainController {
         writeOnImageView(secondChannel, mode, Channel.SECOND);
         writeOnImageView(thirdChannel, mode, Channel.THIRD);
         writeOnImageView(imageView, mode, Channel.ALL);
+        this.mode = mode;
     }
 
     private void writeOnImageView(ImageView view, Mode mode, Channel channel) {
@@ -156,7 +154,7 @@ public class MainController {
             fileChooser.setTitle("Выберите файл");
             File selectedFile = fileChooser.showSaveDialog(imageView.getScene().getWindow());
             if (selectedFile != null) {
-                picture.writeToFile(selectedFile, this.mode, this.channel);
+                picture.writeToFile(selectedFile, this.mode, this.channel, curGamma);
             }
         } catch (Throwable e) {
             System.out.println(e.getMessage());
@@ -192,8 +190,6 @@ public class MainController {
         firstChannel.setImage(null);
         secondChannel.setImage(null);
         thirdChannel.setImage(null);
-        this.curGamma = 0.0;
-        this.interpretGamma = 0.0;
     }
 
     public void onAssignGamma(ActionEvent actionEvent) {
@@ -236,7 +232,7 @@ public class MainController {
             try {
                 double newGamma = Double.parseDouble(gamma);
                 if (newGamma >= 0.0 && newGamma <= 128.0) {
-                    picture.setPixelData(picture.convertGamma(picture.getPixelData(), curGamma, newGamma, mode, channel));
+                    picture.setPixelData(picture.applyGamma(picture.getPixelData(), curGamma, newGamma, mode, channel));
 
                     curGamma = newGamma;
                     draw(picture, mode, channel);

@@ -51,8 +51,6 @@ public class PicturePNM implements Picture {
     private int maxColorValue;
     private String path;
     private Pixel[] pixelData;
-    private Mode mode = Mode.RGB;
-    private Channel channel = Channel.ALL;
 
 
     public String getFormatType() {
@@ -108,9 +106,9 @@ public class PicturePNM implements Picture {
     }
 
     @Override
-    public void writeToFile(File file, Mode mode, Channel channel) {
+    public void writeToFile(File file, Mode mode, Channel channel, double curGamma) {
         try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
-
+/*
             Pixel[] pixelsData = new Pixel[this.pixelData.length];
             for (int i = 0; i < this.pixelData.length; i++) {
                 pixelsData[i] = new Pixel(this.pixelData[i].getFirst(),
@@ -118,8 +116,9 @@ public class PicturePNM implements Picture {
                         this.pixelData[i].getThird());
             }
 
-            pixelsData = OTHER_TO_RGB.get(this.mode).apply(pixelsData, this.channel);
-            pixelsData = RGB_TO_OTHER.get(mode).apply(pixelsData, channel);
+            pixelsData = pixelConversion(Mode.RGB, Channel.ALL, mode, channel, curGamma, curGamma);
+            //pixelsData = OTHER_TO_RGB.get(this.mode).apply(pixelsData, this.channel);
+            //pixelsData = RGB_TO_OTHER.get(mode).apply(pixelsData, channel);
 
             if (channel.equals(Channel.ALL)) {
                 dataOutputStream.writeBytes(formatType + (char) (10));
@@ -143,12 +142,36 @@ public class PicturePNM implements Picture {
                     }
                     dataOutputStream.write(pixels);
                     dataOutputStream.close();
+                }*/
+            pixelData = RGB_TO_OTHER.get(mode).apply(pixelData, channel);
+            if (channel.equals(Channel.ALL)) {
+                dataOutputStream.writeBytes(formatType + (char) (10));
+                dataOutputStream.writeBytes(String.valueOf(width) + (char) (32) + String.valueOf(height) + (char) (10));
+                dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
+
+                if (formatType.equals("P6")) {
+                    byte[] pixels = new byte[3 * height * width];
+                    int cur = 0;
+                    for (int i = 0; i < pixelData.length; i++) {
+                        cur = i * 3;
+                        Pixel curPixel = pixelData[i];
+                        int alpha = 255;
+                        double[] convert = curPixel.getColors();
+                        int first = (int) (convert[0] * 255);
+                        int second = (int) (convert[1] * 255);
+                        int third = (int) (convert[2] * 255);
+                        pixels[cur] = (byte) (first > 127 ? first - 256 : first);
+                        pixels[cur + 1] = (byte) (second > 127 ? second - 256 : second);
+                        pixels[cur + 2] = (byte) (third > 127 ? third - 256 : third);
+                    }
+                    dataOutputStream.write(pixels);
+                    dataOutputStream.close();
                 }
 
                 if (formatType.equals("P5")) {
                     byte[] pixels = new byte[height * width];
-                    for (int i = 0; i < pixelsData.length; i++) {
-                        int first = (int) (pixelsData[i].getColors()[0] * 255);
+                    for (int i = 0; i < pixelData.length; i++) {
+                        int first = (int) (pixelData[i].getColors()[0] * 255);
                         pixels[i] = (byte) (first > 127 ? first - 256 : first);
                     }
                     dataOutputStream.write(pixels);
@@ -159,12 +182,12 @@ public class PicturePNM implements Picture {
                 dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
 
                 byte[] pixels = new byte[height * width];
-                for (int i = 0; i < pixelsData.length; i++) {
+                for (int i = 0; i < pixelData.length; i++) {
                     int first = 0;
                     switch (channel) {
-                        case FIRST -> first = (int) (pixelsData[i].getColors()[0] * 255);
-                        case SECOND -> first = (int) (pixelsData[i].getColors()[1] * 255);
-                        case THIRD -> first = (int) (pixelsData[i].getColors()[2] * 255);
+                        case FIRST -> first = (int) (pixelData[i].getColors()[0] * 255);
+                        case SECOND -> first = (int) (pixelData[i].getColors()[1] * 255);
+                        case THIRD -> first = (int) (pixelData[i].getColors()[2] * 255);
                     }
                     pixels[i] = (byte) (first > 127 ? first - 256 : first);
                 }
@@ -182,9 +205,10 @@ public class PicturePNM implements Picture {
         System.out.println("Режим текущий " + mode + " " + channel);
 
         int[] intRgba = new int[pixelData.length];
-        Pixel[] pixels = pixelConversion(curMode, curChannel, mode, channel);
 
-        pixels = applyGamma(pixels, curGamma, interpretGamma, mode, channel);
+        Pixel[] pixels = pixelConversion(curMode, curChannel, mode, channel, curGamma, interpretGamma);
+
+        //pixels = applyGamma(pixels, curGamma, interpretGamma, mode, channel);
 
         for (int i = 0; i < pixels.length; i++) {
             double[] rgba = pixels[i].getColors();
@@ -198,7 +222,8 @@ public class PicturePNM implements Picture {
     }
 
 
-    public Pixel[] pixelConversion(Mode curMode, Channel curChannel, Mode mode, Channel channel) {
+    public Pixel[] pixelConversion(Mode curMode, Channel curChannel, Mode mode, Channel channel, double curGamma,
+                                   double newGamma) {
         Pixel[] copy = new Pixel[this.pixelData.length];
         for (int i = 0; i < this.pixelData.length; i++) {
             copy[i] = new Pixel(this.pixelData[i].getFirst(),
@@ -206,8 +231,8 @@ public class PicturePNM implements Picture {
                     this.pixelData[i].getThird());
         }
 
-        copy = OTHER_TO_RGB.get(curMode).apply(copy, curChannel);
 
+        copy = applyGamma(copy, curGamma, newGamma, mode, channel);
         copy = RGB_TO_OTHER.get(mode).apply(copy, channel);
         System.out.println("OTHER");
         copy = OTHER_TO_RGB.get(mode).apply(copy, channel);
@@ -238,32 +263,4 @@ public class PicturePNM implements Picture {
         return copy;
     }
 
-    public Pixel[] convertGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel){
-
-        if (curGamma == newGamma) {
-            return pixelData;
-        }
-
-        Pixel[] copy = pixelConversion(mode, channel, curMode, curChannel);
-        GammaCorrection.removeGamma(copy, curGamma);
-        GammaCorrection.assignGamma(copy, newGamma);
-
-        System.out.println("INTERPRET GAMMA = " + newGamma + " APPLY");
-        return copy;
-    }
-
-    @Override
-    public Mode getMode() {
-        return mode;
-    }
-
-    @Override
-    public void setMode(Mode mode) {
-        this.mode = mode;
-    }
-
-    @Override
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-    }
 }

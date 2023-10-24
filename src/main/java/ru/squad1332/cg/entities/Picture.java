@@ -20,17 +20,12 @@ public interface Picture {
 
     void setPath(String path);
 
-    void writeToFile(File file, Mode mode, Channel channel);
-
-    void setMode(Mode mode);
-
-    void setChannel(Channel channel);
+    void writeToFile(File file, Mode mode, Channel channel, double curGamma);
 
     int[] getIntArgb(Mode curMode, Channel curChannel, Mode mode, Channel channel, double curGamma, double interpretGamma);
 
-    Mode getMode();
 
     Pixel[] applyGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel);
 
-    Pixel[] convertGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel);
+    //Pixel[] convertGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel);
 }

@@ -194,7 +194,6 @@ public class ColorConvertor {
         return pixelData;
     }
 
-
     public static Pixel[] convertHsvToRgb(Pixel[] pixelData, Channel channel) {
         for (int i = 0; i < pixelData.length; i++) {
             Pixel color = pixelData[i];

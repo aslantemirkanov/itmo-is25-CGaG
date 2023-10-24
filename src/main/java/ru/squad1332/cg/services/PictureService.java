@@ -1,7 +1,9 @@
 package ru.squad1332.cg.services;
 
+import ru.squad1332.cg.convertor.ColorConvertor;
 import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;
+import ru.squad1332.cg.entities.Pixel;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.parsers.Parser;
@@ -23,12 +25,10 @@ public class PictureService {
         }
     }
 
-    public PicturePNM openPicture(String filePath, Mode mode, Channel channel) throws IOException {
+    public PicturePNM openPicture(String filePath) throws IOException {
         try {
             getType(filePath);
             PicturePNM picture = parser.parse(filePath);
-            picture.setMode(mode);
-            picture.setChannel(channel);
             return picture;
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
