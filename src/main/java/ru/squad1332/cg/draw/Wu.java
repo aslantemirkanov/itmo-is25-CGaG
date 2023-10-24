@@ -79,13 +79,13 @@ public class Wu {
         if (steep) {
             plot(pixels, h, w, yPxl2, xPxl2, rfpart(yEnd) * xGap, pixel);
             for (int i = 1; i < width; i++) {
-                plot(pixels, h, w, yPxl2 + i, xPxl2, 1, pixel);
+                plot(pixels, h, w, yPxl2 + i, xPxl2, transparency, pixel);
             }
             plot(pixels, h, w, yPxl2 + width, xPxl2, fpart(yEnd) * xGap, pixel);
         } else {
             plot(pixels, h, w, xPxl2, yPxl2, rfpart(yEnd) * xGap, pixel);
             for (int i = 1; i < width; i++) {
-                plot(pixels, h, w, xPxl2, yPxl2 + i, 1, pixel);
+                plot(pixels, h, w, xPxl2, yPxl2 + i, transparency, pixel);
             }
             plot(pixels, h, w, xPxl2, yPxl2 + width, fpart(yEnd) * xGap, pixel);
         }
@@ -93,7 +93,7 @@ public class Wu {
             for (double x = xPxl1; x <= xPxl2; x++) {
                 plot(pixels, h, w, ipart(intersectY), x, rfpart(intersectY), pixel);
                 for (int i = 1; i < width; i++) {
-                    plot(pixels, h, w, ipart(intersectY) + i, x, 1, pixel);
+                    plot(pixels, h, w, ipart(intersectY) + i, x, transparency, pixel);
                 }
                 plot(pixels, h, w, ipart(intersectY) + width, x, fpart(intersectY), pixel);
                 intersectY += gradient;
@@ -102,7 +102,7 @@ public class Wu {
             for (double x = xPxl1; x <= xPxl2; x++) {
                 plot(pixels, h, w, x, ipart(intersectY), rfpart(intersectY), pixel);
                 for (int i = 1; i < width; i++) {
-                    plot(pixels, h, w, x, ipart(intersectY) + i, 1, pixel);
+                    plot(pixels, h, w, x, ipart(intersectY) + i, transparency, pixel);
                 }
                 plot(pixels, h, w, x, ipart(intersectY) + width, fpart(intersectY), pixel);
                 intersectY += gradient;

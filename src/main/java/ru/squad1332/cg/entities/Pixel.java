@@ -61,4 +61,11 @@ public class Pixel {
     public Pixel addPixel(Pixel pixel) {
         return new Pixel(getFirst() + pixel.getFirst(), getSecond() + pixel.getSecond(), getThird() + pixel.getThird());
     }
+
+    @Override
+    public String toString() {
+        return "Pixel{" +
+               "rgba=" + Arrays.toString(rgba) +
+               '}';
+    }
 }

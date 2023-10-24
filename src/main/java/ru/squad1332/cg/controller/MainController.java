@@ -275,6 +275,7 @@ public class MainController {
         int width = (int) this.lineWidthSlider.getValue();
         double transparency = this.transparencySlider.getValue();
         Pixel pixel = new Pixel(color);
+        System.out.println("COLOR = " + pixel.addOpacity(transparency));
         Wu.drawLine(this.picture.getPixelData(),
                 this.picture.getWidth(),
                 this.picture.getHeight(),
