@@ -19,6 +19,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Pair;
 import ru.squad1332.cg.dither.DitheringService;
+import ru.squad1332.cg.draw.GradientGenerator;
 import ru.squad1332.cg.draw.Wu;
 import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;
@@ -375,5 +376,11 @@ public class MainController {
         ditherForm.setVisible(false);
         lineForm.setVisible(false);
         imagesViews.setVisible(false);
+    }
+
+    public void onDrawGradient(ActionEvent actionEvent) {
+        Picture picture1 = GradientGenerator.generateGradient(1920, 1080);
+        this.picture = picture1;
+        draw(picture1);
     }
 }

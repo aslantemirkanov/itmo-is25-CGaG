@@ -166,7 +166,7 @@ public class PicturePNM implements Picture {
                         pixels[cur] = (byte) (first > 127 ? first - 256 : first);
                         pixels[cur + 1] = (byte) (second > 127 ? second - 256 : second);
                         pixels[cur + 2] = (byte) (third > 127 ? third - 256 : third);
-                    }
+                    };
                     dataOutputStream.write(pixels);
                     dataOutputStream.close();
                 }

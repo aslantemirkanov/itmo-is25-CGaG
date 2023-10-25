@@ -89,6 +89,7 @@
             <Menu mnemonicParsing="false" text="Фигуры">
                 <items>
                     <MenuItem mnemonicParsing="false" onAction="#onDrawLine" text="Линия" />
+                    <MenuItem mnemonicParsing="false" onAction="#onDrawGradient" text="Градиент" />
                 </items>
             </Menu>
         </menus>
@@ -144,7 +145,7 @@
             <HBox alignment="CENTER" >
                 <children>
                     <Text text="Bit:" />
-                    <Slider fx:id="bitSlider" blockIncrement="1.0" max="10.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="false" />
+                    <Slider fx:id="bitSlider" blockIncrement="1.0" max="8.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="false" />
                     <Label fx:id="bitSliderLabel" />
                 </children>
             </HBox>
