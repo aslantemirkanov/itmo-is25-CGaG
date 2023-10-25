@@ -12,13 +12,13 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.WritablePixelFormat;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Pair;
-import ru.squad1332.cg.dither.DitheringService;
 import ru.squad1332.cg.draw.GradientGenerator;
 import ru.squad1332.cg.draw.Wu;
 import ru.squad1332.cg.entities.Picture;
@@ -30,10 +30,8 @@ import ru.squad1332.cg.services.PictureService;
 
 import java.io.File;
 import java.nio.IntBuffer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MainController {
     private static final double scale = 1.05;
@@ -212,7 +210,7 @@ public class MainController {
             fileChooser.setTitle("Выберите файл");
             File selectedFile = fileChooser.showSaveDialog(canvas.getScene().getWindow());
             if (selectedFile != null) {
-                picture.writeToFile(selectedFile, this.mode, this.channel, curGamma, this.ditherModeComboBox.getValue(), (int)this.bitSlider.getValue());
+                picture.writeToFile(selectedFile, this.mode, this.channel, curGamma, this.ditherModeComboBox.getValue(), (int) this.bitSlider.getValue());
             }
         } catch (Throwable e) {
             System.out.println(e.getMessage());
@@ -280,6 +278,29 @@ public class MainController {
         showConvertGammaInputDialog(new Stage());
     }
 
+    private void showConvertGammaInputDialog(Stage primaryStage) {
+        TextInputDialog dialog = new TextInputDialog("0.0");
+        dialog.setTitle("Ввод гаммы");
+        dialog.setHeaderText("Введите значение гаммы (от 0.0 до 128.0):");
+        dialog.setContentText("Гамма:");
+
+        dialog.showAndWait().ifPresent(gamma -> {
+            try {
+                double newGamma = Double.parseDouble(gamma);
+                if (newGamma >= 0.0 && newGamma <= 128.0) {
+                    picture.setPixelData(picture.applyGamma(picture.getPixelData(), curGamma, newGamma, mode, channel));
+
+                    curGamma = newGamma;
+                    draw(picture, mode, channel);
+                } else {
+                    System.out.println("Неверное значение гаммы. Значение должно быть в диапазоне от 0.0 до 128.0.");
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Ошибка при парсинге значения гаммы.");
+            }
+        });
+    }
+
     public void onDrawLine(ActionEvent actionEvent) {
         hideAll();
         lineForm.setVisible(true);
@@ -336,29 +357,6 @@ public class MainController {
         transparencySlider.setValue(1);
     }
 
-    private void showConvertGammaInputDialog(Stage primaryStage) {
-        TextInputDialog dialog = new TextInputDialog("0.0");
-        dialog.setTitle("Ввод гаммы");
-        dialog.setHeaderText("Введите значение гаммы (от 0.0 до 128.0):");
-        dialog.setContentText("Гамма:");
-
-        dialog.showAndWait().ifPresent(gamma -> {
-            try {
-                double newGamma = Double.parseDouble(gamma);
-                if (newGamma >= 0.0 && newGamma <= 128.0) {
-                    picture.setPixelData(picture.applyGamma(picture.getPixelData(), curGamma, newGamma, mode, channel));
-
-                    curGamma = newGamma;
-                    draw(picture, mode, channel);
-                } else {
-                    System.out.println("Неверное значение гаммы. Значение должно быть в диапазоне от 0.0 до 128.0.");
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Ошибка при парсинге значения гаммы.");
-            }
-        });
-    }
-
     public void applyDithering(ActionEvent actionEvent) {
         String choice = (String) ditherModeComboBox.getValue();
         System.out.println(choice);
@@ -379,8 +377,59 @@ public class MainController {
     }
 
     public void onDrawGradient(ActionEvent actionEvent) {
-        Picture picture1 = GradientGenerator.generateGradient(1920, 1080);
+/*        Picture picture1 = GradientGenerator.generateGradient(1920, 1080);
         this.picture = picture1;
-        draw(picture1);
+        draw(picture1);*/
+        showInputWidthHeight(new Stage());
     }
+
+    public void showInputWidthHeight(Stage primaryStage) {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Введите размеры изображения с градиентом");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        TextField widthTextField = new TextField("256");
+        TextField heightTextField = new TextField("256");
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Ширина:"), 0, 0);
+        grid.add(widthTextField, 1, 0);
+        grid.add(new Label("Высота:"), 0, 1);
+        grid.add(heightTextField, 1, 1);
+
+        dialogPane.setContent(grid);
+        AtomicReference<String> widthString = new AtomicReference<>();
+        AtomicReference<String> heightString = new AtomicReference<>();
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                widthString.set(widthTextField.getText());
+                heightString.set(heightTextField.getText());
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+        System.out.println("Width: " + widthString.get());
+        System.out.println("Height: " + heightString.get());
+
+        try {
+            int inputWidth = Integer.parseInt(widthString.get());
+            int inputHeight = Integer.parseInt(heightString.get()) ;
+            if (inputWidth > 0 && inputWidth <= 1920 && inputHeight > 0 && inputHeight <= 1080) {
+                Picture gradientPicture = GradientGenerator.generateGradient(inputWidth, inputHeight);
+                this.picture = gradientPicture;
+                draw(gradientPicture);
+            } else {
+                System.out.println("Неверное значение ширины или высоты. Значение ширины должно быть в диапазоне от 1 до 1920, а высоты от 1 до 1080");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Значение ширины или высоты неверное. Вы ввели не целое число!!!");
+        }
+
+    }
+
+
 }
