@@ -197,7 +197,7 @@ public class Wu {
         System.out.println("width!!!!!!!!!!!!!!!!!!!!!!!!!!!!!" + width);
         buffer = new double[w * h];
         Arrays.fill(buffer, 0);
-        if (width > 2) {
+        if (width > 1) {
             double angle = Math.atan2(y1 - y0, x1 - x0);
 
             double dx = (width / 2) * Math.sin(angle);
@@ -215,12 +215,12 @@ public class Wu {
             fillRectangle(pixels, w, h, Ax, Ay, Bx, By, Cx, Cy, Dx, Dy, pixel, transparency);
 
             drawSingleLine(pixels, w, h, Ax, Ay, Bx, By, transparency, pixel);
-            drawSingleLine(pixels, w, h, Bx, By  , Cx  , Cy  , transparency, pixel);
+            //drawSingleLine(pixels, w, h, Bx, By  , Cx  , Cy  , transparency, pixel);
             drawSingleLine(pixels, w, h, Cx, Cy  , Dx  , Dy  , transparency, pixel);
-            drawSingleLine(pixels, w, h, Dx, Dy  , Ax  , Ay  , transparency, pixel);
+            //drawSingleLine(pixels, w, h, Dx, Dy  , Ax  , Ay  , transparency, pixel);
 
         } else {
-            drawSingleLine(pixels, w, h, x0, y0, x1, y1, transparency, pixel);
+            drawSingleLine(pixels, w, h, x0, y0, x1, y1, width, pixel);
         }
     }
 
