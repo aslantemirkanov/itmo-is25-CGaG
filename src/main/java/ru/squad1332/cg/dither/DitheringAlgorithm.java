@@ -41,5 +41,5 @@ public abstract class DitheringAlgorithm {
         }
     }
 
-    abstract void apply(Pixel[] picture, int bit, int w, int h);
+    abstract void apply(Pixel[] picture, String format, int bit, int w, int h);
 }

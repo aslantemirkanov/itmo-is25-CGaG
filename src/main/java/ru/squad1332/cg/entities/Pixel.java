@@ -68,4 +68,8 @@ public class Pixel {
                "rgba=" + Arrays.toString(rgba) +
                '}';
     }
+
+    public void setAt(int position, double color) {
+        this.rgba[position] = color;
+    }
 }

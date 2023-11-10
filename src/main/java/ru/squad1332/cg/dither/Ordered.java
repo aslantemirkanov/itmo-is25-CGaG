@@ -5,7 +5,7 @@ import ru.squad1332.cg.entities.Pixel;
 public class Ordered extends DitheringAlgorithm {
 
     @Override
-    public void apply(Pixel[] pixels, int bit, int w, int h) {
+    public void apply(Pixel[] pixels, String format, int bit, int w, int h) {
         int pointer = 0;
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {

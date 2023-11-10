@@ -144,7 +144,7 @@ public class PicturePNM implements Picture {
                     dataOutputStream.close();
                 }*/
             if (dither != null) {
-                DitheringService.applyDithering(pixelData, (String) dither, bit, width, height);
+                DitheringService.applyDithering(pixelData, this.formatType, (String) dither, bit, width, height);
             }
             pixelData = RGB_TO_OTHER.get(mode).apply(pixelData, channel);
             if (channel.equals(Channel.ALL)) {
@@ -235,7 +235,7 @@ public class PicturePNM implements Picture {
         }
 
         if (choice != null) {
-            DitheringService.applyDithering(copy, choice, bit, width, height);
+            DitheringService.applyDithering(copy, choice, this.formatType, bit, width, height);
         }
 
         copy = applyGamma(copy, curGamma, newGamma, mode, channel);
