@@ -183,7 +183,6 @@ public class MainController {
         this.mode = mode;
     }
 
-
     private void writeOnImageView(ImageView view, Mode mode, Channel channel) {
         WritablePixelFormat<IntBuffer> format = PixelFormat.getIntArgbPreInstance();
         WritableImage image = new WritableImage(picture.getWidth(), picture.getHeight());
@@ -246,6 +245,8 @@ public class MainController {
         firstChannel.setImage(null);
         secondChannel.setImage(null);
         thirdChannel.setImage(null);
+        curGamma = 0;
+        interpretGamma = 0;
     }
 
     public void onAssignGamma(ActionEvent actionEvent) {
@@ -312,7 +313,7 @@ public class MainController {
         double[] first = pickedPixels.get(0);
         double[] second = pickedPixels.get(1);
         Color color = this.colorPicker.getValue();
-        int width = (int) this.lineWidthSlider.getValue();
+        double width = (double) this.lineWidthSlider.getValue();
         double transparency = this.transparencySlider.getValue();
         Pixel pixel = new Pixel(color);
         Wu.drawLine(this.picture.getPixelData(),
@@ -336,8 +337,7 @@ public class MainController {
     public void initialize() {
         colorPicker.setValue(Color.BLACK);
         lineWidthSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
-            int lineWidthValue = (int) Math.round(newValue.doubleValue());
-            lineWidthLabel.setText(String.valueOf(lineWidthValue));
+            lineWidthLabel.setText(String.format("%.2f", newValue));
         });
 
         transparencySlider.valueProperty().addListener((observable, oldValue, newValue) -> {
@@ -390,8 +390,8 @@ public class MainController {
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        TextField widthTextField = new TextField("256");
-        TextField heightTextField = new TextField("256");
+        TextField widthTextField = new TextField("1920");
+        TextField heightTextField = new TextField("1080");
 
         GridPane grid = new GridPane();
         grid.add(new Label("Ширина:"), 0, 0);

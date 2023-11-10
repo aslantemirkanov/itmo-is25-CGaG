@@ -7,7 +7,7 @@ import ru.squad1332.cg.entities.Pixel;
 public class GradientGenerator {
     public static Picture generateGradient(int w, int h) {
         PicturePNM result = new PicturePNM();
-        result.setFormatType("P5");
+        result.setFormatType("P6");
         result.setHeight(h);
         result.setWidth(w);
         result.setMaxColorValue(255);
