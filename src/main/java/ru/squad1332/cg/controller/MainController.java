@@ -390,8 +390,8 @@ public class MainController {
         DialogPane dialogPane = dialog.getDialogPane();
         dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
 
-        TextField widthTextField = new TextField("256");
-        TextField heightTextField = new TextField("256");
+        TextField widthTextField = new TextField("1920");
+        TextField heightTextField = new TextField("1080");
 
         GridPane grid = new GridPane();
         grid.add(new Label("Ширина:"), 0, 0);

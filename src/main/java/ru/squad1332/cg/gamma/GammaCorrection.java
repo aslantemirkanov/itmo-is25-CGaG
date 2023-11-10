@@ -24,9 +24,9 @@ public class GammaCorrection {
                 pixelData[i].setSecond(srgbToLineal(g));
                 pixelData[i].setThird(srgbToLineal(b));
             } else {
-                pixelData[i].setFirst(Math.pow(r, gamma));
-                pixelData[i].setSecond(Math.pow(g, gamma));
-                pixelData[i].setThird(Math.pow(b,  gamma));
+                pixelData[i].setFirst(Math.pow(r, 1.0 / gamma));
+                pixelData[i].setSecond(Math.pow(g, 1.0 /  gamma));
+                pixelData[i].setThird(Math.pow(b, 1.0 /  gamma));
             }
         }
         return pixelData;
@@ -43,9 +43,9 @@ public class GammaCorrection {
                 pixelData[i].setSecond(linealToSRGB(g));
                 pixelData[i].setThird(linealToSRGB(b));
             } else {
-                pixelData[i].setFirst(Math.pow(r, 1.0 / gamma));
-                pixelData[i].setSecond(Math.pow(g, 1.0 / gamma));
-                pixelData[i].setThird(Math.pow(b, 1.0 / gamma));
+                pixelData[i].setFirst(Math.pow(r, gamma));
+                pixelData[i].setSecond(Math.pow(g, gamma));
+                pixelData[i].setThird(Math.pow(b, gamma));
             }
         }
         return pixelData;

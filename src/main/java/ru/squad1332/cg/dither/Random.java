@@ -14,6 +14,7 @@ public class Random extends DitheringAlgorithm {
                 Pixel pixel = pixels[pointer++];
                 double[][] values = new double[][]{{0, 0}, {0, 0}, {0, 0}};
                 double[] b = bits[bit - 1];
+                double first = -10;
                 for (int c = 0; c < 3; c++) {
                     for (int t = 0; t < b.length; t++) {
                         if (b[t] >= pixel.getColors()[c]) {
@@ -27,11 +28,27 @@ public class Random extends DitheringAlgorithm {
                             break;
                         }
                     }
-                    double randomThreshold = random.nextDouble();
-                    if (pixel.getColors()[c] >= randomThreshold) {
-                        pixel.getColors()[c] = values[c][1];
+                    if (c == 0) {
+                        double randomThreshold = random.nextDouble();
+                        if (pixel.getColors()[c] >= randomThreshold) {
+                            pixel.getColors()[c] = values[c][1];
+                        } else {
+                            pixel.getColors()[c] = values[c][0];
+                        }
+                        first = pixel.getColors()[c];
+
                     } else {
-                        pixel.getColors()[c] = values[c][0];
+                        if ("P5".equals(format)) {
+                            pixel.getColors()[c] = first;
+                        } else {
+                            double randomThreshold = random.nextDouble();
+                            if (pixel.getColors()[c] >= randomThreshold) {
+                                pixel.getColors()[c] = values[c][1];
+                            } else {
+                                pixel.getColors()[c] = values[c][0];
+                            }
+
+                        }
                     }
 
                 }
