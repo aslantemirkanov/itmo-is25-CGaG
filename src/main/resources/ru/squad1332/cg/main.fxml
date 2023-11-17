@@ -145,13 +145,17 @@
             <HBox alignment="CENTER" >
                 <children>
                     <Text text="Bit:" />
-                    <Slider fx:id="bitSlider" blockIncrement="1.0" max="8.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="false" />
+                    <Slider fx:id="bitSlider" blockIncrement="1.0" max="8.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" valueChanging="true">
+                        <majorTickUnit>1.0</majorTickUnit>
+                    </Slider>
                     <Label fx:id="bitSliderLabel" />
                 </children>
             </HBox>
             <Button onAction="#applyDithering" text="Применить" />
         </children>
     </VBox>
+
+
 
     <Label fx:id="errorMessage" textFill="RED"/>
 

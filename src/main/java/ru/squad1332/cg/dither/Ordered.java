@@ -1,11 +1,12 @@
 package ru.squad1332.cg.dither;
 
 import ru.squad1332.cg.entities.Pixel;
+import ru.squad1332.cg.gamma.GammaCorrection;
 
 public class Ordered extends DitheringAlgorithm {
 
     @Override
-    public void apply(Pixel[] pixels, String format, int bit, int w, int h) {
+    public void apply(Pixel[] pixels, String format, int bit, int w, int h, double gamma) {
         int pointer = 0;
         for (int i = 0; i < w; i++) {
             for (int j = 0; j < h; j++) {

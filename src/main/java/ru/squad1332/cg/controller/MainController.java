@@ -24,6 +24,7 @@ import ru.squad1332.cg.draw.Wu;
 import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;
 import ru.squad1332.cg.entities.Pixel;
+import ru.squad1332.cg.gamma.GammaCorrection;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.services.PictureService;
@@ -361,6 +362,7 @@ public class MainController {
         String choice = (String) ditherModeComboBox.getValue();
         System.out.println(choice);
         int bit = (int) this.bitSlider.getValue();
+        interpretGamma = curGamma;
         draw(picture, choice, bit);
     }
 
@@ -419,6 +421,10 @@ public class MainController {
             int inputWidth = Integer.parseInt(widthString.get());
             int inputHeight = Integer.parseInt(heightString.get()) ;
             if (inputWidth > 0 && inputWidth <= 1920 && inputHeight > 0 && inputHeight <= 1080) {
+                /*this.picture.setPixelData(GammaCorrection.removeGamma(this.picture.getPixelData(), curGamma));
+                */
+                curGamma = 1;
+                interpretGamma = 1;
                 Picture gradientPicture = GradientGenerator.generateGradient(inputWidth, inputHeight);
                 this.picture = gradientPicture;
                 draw(gradientPicture);

@@ -14,11 +14,9 @@ public class GradientGenerator {
         Pixel[] pixels = new Pixel[w * h];
         int pointer = 0;
         for (int j = 0; j < h; j++) {
-            double start = 0;
-            double step = (double) 255 / (w * 255);
+            double step = 1.0 / (w - 1);
             for (int i = 0; i < w; i++) {
-                pixels[pointer++] = new Pixel(start, start, start);
-                start += step;
+                pixels[pointer++] = new Pixel(i * step,i * step,i * step);
             }
         }
         result.setPixelData(pixels);

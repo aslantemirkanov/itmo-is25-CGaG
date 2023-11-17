@@ -1,15 +1,17 @@
 package ru.squad1332.cg.dither;
 
 import ru.squad1332.cg.entities.Pixel;
+import ru.squad1332.cg.gamma.GammaCorrection;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class Atkinson extends DitheringAlgorithm {
+public class
+Atkinson extends DitheringAlgorithm {
     Set<Double> set = new HashSet<>();
 
     @Override
-    void apply(Pixel[] pixels, String format, int bit, int w, int h) {
+    void apply(Pixel[] pixels, String format, int bit, int w, int h, double gamma) {
         int pointer;
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
@@ -18,6 +20,7 @@ public class Atkinson extends DitheringAlgorithm {
                 double[] values = new double[]{0, 0};
                 double[] b = bits[bit - 1];
                 for (int c = 0; c < 3; c++) {
+                    pixel.getColors()[c] = GammaCorrection.doubleFromLineal(pixel.getColors()[c], gamma);
                     for (int t = 0; t < b.length; t++) {
                         if (b[t] >= pixel.getColors()[c]) {
                             if (t == 0) {
@@ -32,10 +35,15 @@ public class Atkinson extends DitheringAlgorithm {
                     }
                     double newValue = (Math.abs(pixel.getColors()[c] - values[0]) <
                             Math.abs(pixel.getColors()[c] - values[1])) ? values[0] : values[1];
-                    set.add(newValue);
-                    pixels[pointer].setAt(c, newValue);
+
+                    newValue = GammaCorrection.doubleToLineal(newValue, gamma);
+                    pixel.getColors()[c] = GammaCorrection.doubleToLineal(pixel.getColors()[c], gamma);
 
                     double error = pixel.getColors()[c] - newValue;
+
+                    pixels[pointer].setAt(c, newValue);
+                    set.add(newValue);
+
                     int[][] offset = {
                             {1, 0}, {2, 0},
                             {-1, 1}, {0, 1}, {1, 1},

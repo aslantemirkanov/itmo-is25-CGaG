@@ -70,4 +70,56 @@ public class GammaCorrection {
         }
         return res;
     }
+
+    public static Pixel pixelToLineal(Pixel color, double gamma){
+        double r = color.getFirst();
+        double g = color.getSecond();
+        double b = color.getThird();
+        if (gamma == 0) {
+            color.setFirst(srgbToLineal(r));
+            color.setSecond(srgbToLineal(g));
+            color.setThird(srgbToLineal(b));
+        } else {
+            color.setFirst(Math.pow(r, 1.0 / gamma));
+            color.setSecond(Math.pow(g, 1.0 /  gamma));
+            color.setThird(Math.pow(b, 1.0 /  gamma));
+        }
+        return color;
+    }
+
+    public static Pixel pixelFromLineal(Pixel color, double gamma){
+        double r = color.getFirst();
+        double g = color.getSecond();
+        double b = color.getThird();
+        if (gamma == 0) {
+            color.setFirst(linealToSRGB(r));
+            color.setSecond(linealToSRGB(g));
+            color.setThird(linealToSRGB(b));
+        } else {
+            color.setFirst(Math.pow(r, gamma));
+            color.setSecond(Math.pow(g, gamma));
+            color.setThird(Math.pow(b, gamma));
+        }
+        return color;
+    }
+
+    public static double doubleToLineal(double color, double gamma){
+        double result = color;
+        if (gamma == 0) {
+            result = srgbToLineal(result);
+        } else {
+            result = (Math.pow(result, 1.0 / gamma));
+        }
+        return result;
+    }
+
+    public static double doubleFromLineal(double color, double gamma){
+        double result = color;
+        if (gamma == 0) {
+            result = linealToSRGB(result);
+        } else {
+            result = Math.pow(result, gamma);
+        }
+        return result;
+    }
 }

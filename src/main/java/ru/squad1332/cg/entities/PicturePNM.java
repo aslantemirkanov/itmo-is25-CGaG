@@ -108,43 +108,8 @@ public class PicturePNM implements Picture {
     @Override
     public void writeToFile(File file, Mode mode, Channel channel, double curGamma, Object dither, int bit) {
         try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
-/*
-            Pixel[] pixelsData = new Pixel[this.pixelData.length];
-            for (int i = 0; i < this.pixelData.length; i++) {
-                pixelsData[i] = new Pixel(this.pixelData[i].getFirst(),
-                        this.pixelData[i].getSecond(),
-                        this.pixelData[i].getThird());
-            }
-
-            pixelsData = pixelConversion(Mode.RGB, Channel.ALL, mode, channel, curGamma, curGamma);
-            //pixelsData = OTHER_TO_RGB.get(this.mode).apply(pixelsData, this.channel);
-            //pixelsData = RGB_TO_OTHER.get(mode).apply(pixelsData, channel);
-
-            if (channel.equals(Channel.ALL)) {
-                dataOutputStream.writeBytes(formatType + (char) (10));
-                dataOutputStream.writeBytes(String.valueOf(width) + (char) (32) + String.valueOf(height) + (char) (10));
-                dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
-
-                if (formatType.equals("P6")) {
-                    byte[] pixels = new byte[3 * height * width];
-                    int cur = 0;
-                    for (int i = 0; i < pixelsData.length; i++) {
-                        cur = i * 3;
-                        Pixel curPixel = pixelsData[i];
-                        int alpha = 255;
-                        double[] convert = curPixel.getColors();
-                        int first = (int) (convert[0] * 255);
-                        int second = (int) (convert[1] * 255);
-                        int third = (int) (convert[2] * 255);
-                        pixels[cur] = (byte) (first > 127 ? first - 256 : first);
-                        pixels[cur + 1] = (byte) (second > 127 ? second - 256 : second);
-                        pixels[cur + 2] = (byte) (third > 127 ? third - 256 : third);
-                    }
-                    dataOutputStream.write(pixels);
-                    dataOutputStream.close();
-                }*/
             if (dither != null) {
-                DitheringService.applyDithering(pixelData, dither.toString(), this.formatType, bit, width, height);
+                DitheringService.applyDithering(pixelData, dither.toString(), this.formatType, bit, width, height, curGamma);
             }
             pixelData = RGB_TO_OTHER.get(mode).apply(pixelData, channel);
             if (channel.equals(Channel.ALL)) {
@@ -166,7 +131,8 @@ public class PicturePNM implements Picture {
                         pixels[cur] = (byte) (first > 127 ? first - 256 : first);
                         pixels[cur + 1] = (byte) (second > 127 ? second - 256 : second);
                         pixels[cur + 2] = (byte) (third > 127 ? third - 256 : third);
-                    };
+                    }
+                    ;
                     dataOutputStream.write(pixels);
                     dataOutputStream.close();
                 }
@@ -236,7 +202,7 @@ public class PicturePNM implements Picture {
         copy = applyGamma(copy, curGamma, newGamma, mode, channel);
 
         if (choice != null) {
-            DitheringService.applyDithering(copy, choice, this.formatType, bit, width, height);
+            DitheringService.applyDithering(copy, choice, this.formatType, bit, width, height, newGamma);
         }
 
         copy = RGB_TO_OTHER.get(mode).apply(copy, channel);
