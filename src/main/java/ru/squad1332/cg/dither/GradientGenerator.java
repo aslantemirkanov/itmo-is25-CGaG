@@ -1,4 +1,4 @@
-package ru.squad1332.cg.draw;
+package ru.squad1332.cg.dither;
 
 import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;

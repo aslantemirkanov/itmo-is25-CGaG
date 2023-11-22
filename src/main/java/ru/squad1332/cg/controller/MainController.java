@@ -1,10 +1,18 @@
 package ru.squad1332.cg.controller;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Cursor;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.chart.BarChart;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelFormat;
@@ -19,20 +27,24 @@ import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import org.apache.commons.lang3.tuple.Pair;
-import ru.squad1332.cg.draw.GradientGenerator;
+import ru.squad1332.cg.dither.GradientGenerator;
 import ru.squad1332.cg.draw.Wu;
 import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;
 import ru.squad1332.cg.entities.Pixel;
-import ru.squad1332.cg.gamma.GammaCorrection;
+import ru.squad1332.cg.histogram.HistogramService;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
 import ru.squad1332.cg.services.PictureService;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.IntBuffer;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+
+import static ru.squad1332.cg.entities.PicturePNM.OTHER_TO_RGB;
+import static ru.squad1332.cg.entities.PicturePNM.RGB_TO_OTHER;
 
 public class MainController {
     private static final double scale = 1.05;
@@ -221,6 +233,7 @@ public class MainController {
 
     @FXML
     protected void colorConvertor(ActionEvent event) {
+        clearBottomBar();
         MenuItem menuItem = (MenuItem) event.getSource();
         String format = menuItem.getId();
 
@@ -305,6 +318,7 @@ public class MainController {
     public void onDrawLine(ActionEvent actionEvent) {
         hideAll();
         lineForm.setVisible(true);
+        lineForm.setManaged(true);
         canvas.setCursor(Cursor.CROSSHAIR);
     }
 
@@ -368,20 +382,23 @@ public class MainController {
 
     public void onDithering(ActionEvent actionEvent) {
         hideAll();
+        imagesViews.setManaged(false);
         ditherForm.setVisible(true);
-
+        ditherForm.setManaged(true);
     }
 
     private void hideAll() {
-        ditherForm.setVisible(false);
-        lineForm.setVisible(false);
+        clearBottomBar();
         imagesViews.setVisible(false);
     }
 
+    public void clearBottomBar() {
+        ditherForm.setVisible(false);
+        ditherForm.setManaged(false);
+        lineForm.setVisible(false);
+        lineForm.setManaged(false);
+    }
     public void onDrawGradient(ActionEvent actionEvent) {
-/*        Picture picture1 = GradientGenerator.generateGradient(1920, 1080);
-        this.picture = picture1;
-        draw(picture1);*/
         showInputWidthHeight(new Stage());
     }
 
@@ -419,17 +436,17 @@ public class MainController {
 
         try {
             int inputWidth = Integer.parseInt(widthString.get());
-            int inputHeight = Integer.parseInt(heightString.get()) ;
+            int inputHeight = Integer.parseInt(heightString.get());
             if (inputWidth > 0 && inputWidth <= 1920 && inputHeight > 0 && inputHeight <= 1080) {
                 /*this.picture.setPixelData(GammaCorrection.removeGamma(this.picture.getPixelData(), curGamma));
-                */
+                 */
                 curGamma = 1;
                 interpretGamma = 1;
                 Picture gradientPicture = GradientGenerator.generateGradient(inputWidth, inputHeight);
                 this.picture = gradientPicture;
                 draw(gradientPicture);
             } else {
-                System.out.println("Неверное значение ширины или высоты. Значение ширины должно быть в диапазоне от 1 до 1920, а высоты от 1 до 1080");
+                System.out.println("Неверное значение доли автокоррекции. Значение должно быть в диапазоне [0, 0.5)");
             }
         } catch (NumberFormatException e) {
             System.out.println("Значение ширины или высоты неверное. Вы ввели не целое число!!!");
@@ -437,5 +454,116 @@ public class MainController {
 
     }
 
+    public void onAutoCorrection(ActionEvent actionEvent) {
+        showAutoCorrectionWindow(new Stage());
+    }
+
+    public void showAutoCorrectionWindow(Stage primaryStage) {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Введите долю игнорируемых пикселей в диапазоне [0, 0.5)");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        TextField valueTextField = new TextField("0");
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Диапазон:"), 0, 0);
+        grid.add(valueTextField, 1, 0);
+
+        dialogPane.setContent(grid);
+        AtomicReference<String> valueString = new AtomicReference<>();
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                valueString.set(valueTextField.getText());
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+        System.out.println("AutoCorrection: " + valueString.get());
+
+        try {
+            double value = Double.parseDouble(valueString.get());
+            if (value >= 0 && value < 0.5) {
+                System.out.println(value + "ALL RIGHT");
+
+
+                Pixel[] copy = new Pixel[picture.getPixelData().length];
+
+                for (int i = 0; i < copy.length; i++) {
+                    copy[i] = new Pixel(picture.getPixelData()[i].getFirst(),
+                            picture.getPixelData()[i].getSecond(),
+                            picture.getPixelData()[i].getThird());
+                }
+                boolean flag = false;
+                copy = RGB_TO_OTHER.get(mode).apply(copy, channel);
+
+                if (mode.equals(Mode.RGB) || mode.equals(Mode.CMY)) {
+                    HistogramService.applyCorrection(copy, mode, channel, value);
+                    flag = true;
+                }
+
+                if (mode.equals(Mode.HSL) && (channel.equals(Channel.ALL) || channel.equals(Channel.THIRD))) {
+                    HistogramService.applyCorrection(copy, mode, Channel.THIRD, value);
+                    flag = true;
+                }
+
+                if (mode.equals(Mode.HSV) && (channel.equals(Channel.ALL) || channel.equals(Channel.THIRD))) {
+                    HistogramService.applyCorrection(copy, mode, Channel.THIRD, value);
+                    flag = true;
+                }
+
+                if (mode.equals(Mode.YCBCR601) && (channel.equals(Channel.ALL) || channel.equals(Channel.FIRST))) {
+                    HistogramService.applyCorrection(copy, mode, Channel.FIRST, value);
+                    flag = true;
+                }
+
+                if (mode.equals(Mode.YCBCR709) && (channel.equals(Channel.ALL) || channel.equals(Channel.FIRST))) {
+                    HistogramService.applyCorrection(copy, mode, Channel.FIRST, value);
+                    flag = true;
+                }
+
+                if (mode.equals(Mode.YCOCG) && (channel.equals(Channel.ALL) || channel.equals(Channel.FIRST))) {
+                    HistogramService.applyCorrection(copy, mode, Channel.FIRST, value);
+                    flag = true;
+                }
+
+                copy = OTHER_TO_RGB.get(mode).apply(copy, channel);
+
+                if (flag) {
+                    this.picture.setPixelData(copy);
+                    draw(picture, mode, channel);
+                }
+            } else {
+                System.out.println("Неверное значение доли автокоррекции. Значение должно быть в диапазоне [0, 0.5)");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Значение доли автокоррекции неверное. Вы ввели не число!!!");
+        }
+
+    }
+
+    public void cleanImageViews() {
+        firstChannel.setImage(null);
+        secondChannel.setImage(null);
+        thirdChannel.setImage(null);
+    }
+
+    public void onDrawHistogram(ActionEvent actionEvent) {
+        Pixel[] copy = new Pixel[picture.getPixelData().length];
+
+        for (int i = 0; i < copy.length; i++) {
+            copy[i] = new Pixel(picture.getPixelData()[i].getFirst(),
+                    picture.getPixelData()[i].getSecond(),
+                    picture.getPixelData()[i].getThird());
+        }
+
+        copy = RGB_TO_OTHER.get(mode).apply(copy, channel);
+
+        HistogramService.drawHistogram(copy, mode, channel);
+
+    }
 
 }

@@ -21,6 +21,7 @@
                     <MenuItem mnemonicParsing="false" onAction="#onSaveAs" text="Сохранить" />
                 </items>
             </Menu>
+
             <Menu mnemonicParsing="false" text="Цветовые пространства">
                 <items>
                     <Menu mnemonicParsing="false" text="RGB">
@@ -86,28 +87,43 @@
                 </MenuItem>
                 <MenuItem mnemonicParsing="false" text="Dithering" onAction="#onDithering"/>
             </Menu>
+
             <Menu mnemonicParsing="false" text="Фигуры">
                 <items>
                     <MenuItem mnemonicParsing="false" onAction="#onDrawLine" text="Линия" />
                     <MenuItem mnemonicParsing="false" onAction="#onDrawGradient" text="Градиент" />
                 </items>
             </Menu>
+
+            <Menu mnemonicParsing="false" text="Гистограмма">
+                <items>
+                    <MenuItem mnemonicParsing="false" onAction="#onDrawHistogram" text="Построить гистограмму" />
+                    <MenuItem mnemonicParsing="false" onAction="#onAutoCorrection" text="Автокоррекция" />
+                </items>
+            </Menu>
+
+
+            <Menu mnemonicParsing="false" text="Очистка">
+                    <MenuItem mnemonicParsing="false" onAction="#clearBottomBar" text="Clear" />
+            </Menu>
+
         </menus>
     </MenuBar>
     <Label fx:id="filename" text="Выберите фото"/>
 
-    <ScrollPane fx:id="scrollPane" maxHeight="1080" minHeight="150">
+    <ScrollPane fx:id="scrollPane" maxHeight="450" minHeight="450">
         <Canvas width="1080" height="150" fx:id="canvas" onScroll="#handleScroll" pickOnBounds="true" onMouseClicked="#pixelPicked"/>
     </ScrollPane>
 
     <HBox fx:id="imagesViews" visible="false">
-        <ImageView fx:id="firstChannel" fitHeight="150" fitWidth="250"  pickOnBounds="true"
+        <ImageView fx:id="firstChannel" fitHeight="250" fitWidth="350"  pickOnBounds="true"
                    preserveRatio="true"/>
-        <ImageView fx:id="secondChannel" fitHeight="150" fitWidth="250"  pickOnBounds="true"
+        <ImageView fx:id="secondChannel" fitHeight="250" fitWidth="350"  pickOnBounds="true"
                    preserveRatio="true"/>
-        <ImageView fx:id="thirdChannel" fitHeight="150" fitWidth="250"  pickOnBounds="true"
+        <ImageView fx:id="thirdChannel" fitHeight="250" fitWidth="350"  pickOnBounds="true"
                    preserveRatio="true"/>
     </HBox>
+
     <VBox fx:id="lineForm" visible="false" alignment="CENTER">
         <children>
             <HBox alignment="CENTER" >
