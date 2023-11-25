@@ -14,6 +14,7 @@ public class Ordered extends DitheringAlgorithm {
                 double[][] values = new double[][]{{0, 0}, {0, 0}, {0, 0}};
                 double[] b = bits[bit - 1];
                 for (int c = 0; c < 3; c++) {
+                    pixel.getColors()[c] = GammaCorrection.doubleFromLineal(pixel.getColors()[c], gamma);
                     for (int t = 0; t < b.length; t++) {
                         if (b[t] >= pixel.getColors()[c]) {
                             if (t == 0) {
@@ -26,7 +27,10 @@ public class Ordered extends DitheringAlgorithm {
                             break;
                         }
                     }
-                    if (pixel.getColors()[c] >= thresholdMap[i % 8][j % 8]) {
+
+                    double gammaThreshold = GammaCorrection.doubleToLineal(thresholdMap[i % 8][j % 8], gamma);
+
+                    if (pixel.getColors()[c] >= gammaThreshold) {
                         pixel.getColors()[c] = values[c][1];
                     } else {
                         pixel.getColors()[c] = values[c][0];

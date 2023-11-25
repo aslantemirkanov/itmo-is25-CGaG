@@ -16,6 +16,7 @@ public class Random extends DitheringAlgorithm {
             double[][] values = new double[][]{{0, 0}, {0, 0}, {0, 0}};
             double first = -10;
             for (int c = 0; c < 3; c++) {
+                pixel.getColors()[c] = GammaCorrection.doubleFromLineal(pixel.getColors()[c], gamma);
                 for (int t = 0; t < b.length; t++) {
                     if (b[t] >= pixel.getColors()[c]) {
                         if (t == 0) {
@@ -28,16 +29,21 @@ public class Random extends DitheringAlgorithm {
                         break;
                     }
                 }
+
+                pixel.getColors()[c] = GammaCorrection.doubleToLineal(pixel.getColors()[c], gamma);
+
                 if (c == 0) {
-                    double minRange = values[c][0];
-                    double maxRange = values[c][1];
+                    double minRange = GammaCorrection.doubleToLineal(values[c][0], gamma);
+                    double maxRange = GammaCorrection.doubleToLineal(values[c][1],gamma);
 
                     double randomThreshold = minRange + (maxRange - minRange) * random.nextDouble();
 
                     if (pixel.getColors()[c] >= randomThreshold) {
-                        pixel.getColors()[c] = values[c][1];
+                        pixel.getColors()[c] = GammaCorrection.doubleToLineal(values[c][1], gamma);
+                        //pixel.getColors()[c] = values[c][1];
                     } else {
-                        pixel.getColors()[c] = values[c][0];
+                        pixel.getColors()[c] = GammaCorrection.doubleToLineal(values[c][0], gamma);
+                        //pixel.getColors()[c] = values[c][0];
                     }
                     first = pixel.getColors()[c];
 
@@ -45,18 +51,20 @@ public class Random extends DitheringAlgorithm {
                     if ("P5".equals(format)) {
                         pixel.getColors()[c] = first;
                     } else {
-                        double minRange = values[c][0];
-                        double maxRange = values[c][1];
+                        double minRange = GammaCorrection.doubleToLineal(values[c][0], gamma);
+                        double maxRange = GammaCorrection.doubleToLineal(values[c][1],gamma);
 
                         double randomThreshold = minRange + (maxRange - minRange) * random.nextDouble();
                         if (pixel.getColors()[c] >= randomThreshold) {
-                            pixel.getColors()[c] = values[c][1];
+                            pixel.getColors()[c] = GammaCorrection.doubleToLineal(values[c][1], gamma);
                         } else {
-                            pixel.getColors()[c] = values[c][0];
+                            pixel.getColors()[c] = GammaCorrection.doubleToLineal(values[c][0], gamma);
                         }
 
                     }
                 }
+
+                //pixel.getColors()[c] = GammaCorrection.doubleToLineal(pixel.getColors()[c], gamma);
 
             }
         }

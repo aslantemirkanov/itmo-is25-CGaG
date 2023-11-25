@@ -423,8 +423,8 @@ public class MainController {
             if (inputWidth > 0 && inputWidth <= 1920 && inputHeight > 0 && inputHeight <= 1080) {
                 /*this.picture.setPixelData(GammaCorrection.removeGamma(this.picture.getPixelData(), curGamma));
                 */
-                curGamma = 1;
-                interpretGamma = 1;
+                curGamma = 0;
+                interpretGamma = 0;
                 Picture gradientPicture = GradientGenerator.generateGradient(inputWidth, inputHeight);
                 this.picture = gradientPicture;
                 draw(gradientPicture);
