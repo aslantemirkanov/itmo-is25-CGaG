@@ -318,7 +318,6 @@ public class MainController {
     public void onDrawLine(ActionEvent actionEvent) {
         hideAll();
         lineForm.setVisible(true);
-        lineForm.setManaged(true);
         canvas.setCursor(Cursor.CROSSHAIR);
     }
 
@@ -398,7 +397,11 @@ public class MainController {
         lineForm.setVisible(false);
         lineForm.setManaged(false);
     }
+
     public void onDrawGradient(ActionEvent actionEvent) {
+/*        Picture picture1 = GradientGenerator.generateGradient(1920, 1080);
+        this.picture = picture1;
+        draw(picture1);*/
         showInputWidthHeight(new Stage());
     }
 
@@ -439,9 +442,9 @@ public class MainController {
             int inputHeight = Integer.parseInt(heightString.get());
             if (inputWidth > 0 && inputWidth <= 1920 && inputHeight > 0 && inputHeight <= 1080) {
                 /*this.picture.setPixelData(GammaCorrection.removeGamma(this.picture.getPixelData(), curGamma));
-                 */
-                curGamma = 1;
-                interpretGamma = 1;
+                */
+                curGamma = 0;
+                interpretGamma = 0;
                 Picture gradientPicture = GradientGenerator.generateGradient(inputWidth, inputHeight);
                 this.picture = gradientPicture;
                 draw(gradientPicture);
