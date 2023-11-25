@@ -315,11 +315,6 @@ public class MainController {
         });
     }
 
-    public void onDrawLine(ActionEvent actionEvent) {
-        hideAll();
-        lineForm.setVisible(true);
-        canvas.setCursor(Cursor.CROSSHAIR);
-    }
 
     public void drawLine(ActionEvent actionEvent) {
         canvas.setCursor(Cursor.DEFAULT);
@@ -384,6 +379,14 @@ public class MainController {
         imagesViews.setManaged(false);
         ditherForm.setVisible(true);
         ditherForm.setManaged(true);
+    }
+
+    public void onDrawLine(ActionEvent actionEvent) {
+        hideAll();
+        imagesViews.setManaged(false);
+        lineForm.setVisible(true);
+        lineForm.setManaged(true);
+        canvas.setCursor(Cursor.CROSSHAIR);
     }
 
     private void hideAll() {
