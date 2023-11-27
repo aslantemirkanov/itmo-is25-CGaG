@@ -1,5 +1,6 @@
 package ru.squad1332.cg.parsers;
 
+import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;
 import ru.squad1332.cg.entities.Pixel;
 
@@ -10,7 +11,7 @@ import java.io.IOException;
 
 public class ParserPNM implements Parser {
     @Override
-    public PicturePNM parse(String path) throws IOException {
+    public Picture parse(String path) throws IOException {
         try (FileInputStream reader = new FileInputStream(path);
              BufferedReader bufferedReader = new BufferedReader(new FileReader(path))) {
             PicturePNM picture = new PicturePNM();

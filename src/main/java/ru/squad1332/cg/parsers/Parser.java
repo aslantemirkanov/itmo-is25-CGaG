@@ -8,5 +8,5 @@ import java.io.File;
 import java.io.IOException;
 
 public interface Parser {
-    PicturePNM parse(String path) throws IOException;
+    Picture parse(String path) throws IOException;
 }

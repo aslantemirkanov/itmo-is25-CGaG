@@ -144,7 +144,7 @@ public class MainController {
             this.file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
             if (this.file != null) {
                 picture = pictureService.openPicture(this.file.getPath());
-                picture.setPixelData(PicturePNM.OTHER_TO_RGB.get(mode).apply(picture.getPixelData(), channel));
+                //picture.setPixelData(PicturePNM.OTHER_TO_RGB.get(mode).apply(picture.getPixelData(), channel));
                 draw(picture);
             }
         } catch (Throwable e) {
