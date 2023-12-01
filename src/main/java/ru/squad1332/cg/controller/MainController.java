@@ -144,6 +144,10 @@ public class MainController {
             this.file = fileChooser.showOpenDialog(canvas.getScene().getWindow());
             if (this.file != null) {
                 picture = pictureService.openPicture(this.file.getPath());
+                if (picture.getFormatType().equals("PNG")){
+                    curGamma = picture.getGamma();
+                    interpretGamma = picture.getGamma();
+                }
                 //picture.setPixelData(PicturePNM.OTHER_TO_RGB.get(mode).apply(picture.getPixelData(), channel));
                 draw(picture);
             }
@@ -303,9 +307,10 @@ public class MainController {
                 double newGamma = Double.parseDouble(gamma);
                 if (newGamma >= 0.0 && newGamma <= 128.0) {
                     picture.setPixelData(picture.applyGamma(picture.getPixelData(), curGamma, newGamma, mode, channel));
-
+                    picture.setGamma(newGamma);
                     curGamma = newGamma;
                     draw(picture, mode, channel);
+
                 } else {
                     System.out.println("Неверное значение гаммы. Значение должно быть в диапазоне от 0.0 до 128.0.");
                 }

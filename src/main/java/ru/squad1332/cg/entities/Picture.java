@@ -11,6 +11,8 @@ public interface Picture {
     void setPixelData(Pixel[] pixelData);
 
     String getFormatType();
+    double getGamma();
+    void setGamma(double gamma);
 
     int getWidth();
 

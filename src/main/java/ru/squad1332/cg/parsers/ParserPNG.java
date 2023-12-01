@@ -1,8 +1,10 @@
 package ru.squad1332.cg.parsers;
 
 import ru.squad1332.cg.entities.Picture;
+import ru.squad1332.cg.entities.PicturePNG;
 import ru.squad1332.cg.entities.PicturePNM;
 import ru.squad1332.cg.entities.Pixel;
+import ru.squad1332.cg.gamma.GammaCorrection;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -12,9 +14,6 @@ import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -32,6 +31,10 @@ public class ParserPNG implements Parser {
     static byte compressionMethod;
     static byte filterMethod;
     static byte interlaceMethod;
+    static int[][] palette;
+
+    static int bytesPerPixel;
+
 
     @Override
     public Picture parse(String path) throws IOException {
@@ -41,7 +44,8 @@ public class ParserPNG implements Parser {
 
             ArrayList<Chunk> chunks = new ArrayList<>();
             ArrayList<Chunk> idatChunks = new ArrayList<>();
-            byte[] data = new byte[0];
+            boolean isSRGB = false;
+            double gamma = 0;
 
             while (true) {
                 Chunk chunk = readChunk(fis);
@@ -72,17 +76,23 @@ public class ParserPNG implements Parser {
 
                 } else if ("PLTE".equals(chunk.type)) {
                     chunks.add(chunk);
-                    System.out.println("PLTE");
+                    palette = extractPallet(chunk);
+                    System.out.println("PLTE " + palette.length);
                 } else if ("IDAT".equals(chunk.type)) {
                     chunks.add(chunk);
                     idatChunks.add(chunk);
                     System.out.println("IDAT");
                 } else if ("sRGB".equals(chunk.type)) {
                     chunks.add(chunk);
+                    isSRGB = true;
+                    gamma = 0;
                     System.out.println("sRGB");
                 } else if ("gAMA".equals(chunk.type)) {
                     chunks.add(chunk);
-                    System.out.println("gAMA");
+                    long gammaInt = ByteBuffer.wrap(chunk.data).order(ByteOrder.BIG_ENDIAN).getInt() & 0xffffffffL;
+                    gamma = gammaInt / 100000.0;
+                    System.out.println("GAMMA " + gamma);
+                    //System.out.println("gAMA");
                 } else if ("pHYs".equals(chunk.type)) {
                     chunks.add(chunk);
                     System.out.println("pHYs");
@@ -92,24 +102,96 @@ public class ParserPNG implements Parser {
                 }
             }
 
-            //byte[] decompressedData = decompress(data);
-
             byte[] decompressedData = decompress(idatChunks);
+
             System.out.println(decompressedData.length + " decompressed LENGHT");
             System.out.println("Wight " + width + " height " + height);
             System.out.println("pixel count " + width * height);
 
-            Pixel[] pixelData = extractPixelData(decompressedData);
+            int[] filterTypes = new int[height];
 
-            PicturePNM picturePNM = new PicturePNM();
-            picturePNM.setWidth(width);
-            picturePNM.setHeight(height);
-            picturePNM.setMaxColorValue(255);
-            picturePNM.setFormatType("P6");
-            picturePNM.setPixelData(pixelData);
-            return  picturePNM;
+            Pixel[] pixelData = extractPixelData(decompressedData, filterTypes, colorType);
+
+
+            PicturePNG picture = new PicturePNG();
+            picture.filterTypes = filterTypes;
+            picture.setWidth(width);
+            picture.setHeight(height);
+            picture.setMaxColorValue(255);
+            picture.setFormatType("PNG");
+            picture.isSRGB = isSRGB;
+
+            if (!isSRGB && gamma != 0) {
+                pixelData = GammaCorrection.convertGamma(pixelData, 1, gamma);
+            }
+            picture.setGamma(gamma);
+            picture.bitDepth = bitDepth;
+            picture.colorType = colorType;
+            picture.compressionMethod = compressionMethod;
+            picture.filterMethod = filterMethod;
+            picture.interlaceMethod = interlaceMethod;
+            picture.setPixelData(pixelData);
+            picture.setChunks(chunks);
+            picture.setPallet(palette);
+            picture.bytesPerPixel = bytesPerPixel;
+
+            System.out.println(decompressedData.length + " decompressed LENGHT");
+            System.out.println("Wight " + width + " height " + height);
+            System.out.println("pixel count " + width * height);
+
+            return picture;
+
         }
 
+    }
+
+    private static Pixel[] extractPixelData(byte[] decompressedData,int[] filterTypes, byte colorType) {
+        Pixel[] pixels = new Pixel[width * height];
+
+        bytesPerPixel = calculateBytesPerPixel(colorType, bitDepth);
+        int pixelIndex = 0;
+        int rowStart = 1;
+
+        for (int row = 0; row < height; row++) {
+
+            int filterType = decompressedData[row * (width * bytesPerPixel + 1)] & 0xFF;
+            filterTypes[row] = filterType;
+
+            System.out.println("filter " + filterType);
+
+            for (int col = 0; col < width; col++) {
+
+                int index = rowStart + col * bytesPerPixel;
+
+                int red, green, blue;
+                if (colorType == 2 || colorType == 6) {
+                    red = applyFilter(decompressedData, filterType, row, col, index, 0, bytesPerPixel);
+                    decompressedData[index] = (byte) red;
+                    green = applyFilter(decompressedData, filterType, row, col, index, 1, bytesPerPixel);
+                    decompressedData[index + 1] = (byte) green;
+                    blue = applyFilter(decompressedData, filterType, row, col, index, 2, bytesPerPixel);
+                    decompressedData[index + 2] = (byte) blue;
+                } else if (colorType == 0 || colorType == 4) {
+                    red = applyFilter(decompressedData, filterType, row, col, index, 0, bytesPerPixel);
+                    decompressedData[index] = (byte) red;
+                    green = red;
+                    blue = red;
+                } else {
+                    red = applyStaticFilter(decompressedData, filterType, row, col, index, 0, bytesPerPixel);
+                    green = applyStaticFilter(decompressedData, filterType, row, col, index, 1, bytesPerPixel);
+                    blue = applyStaticFilter(decompressedData, filterType, row, col, index, 2, bytesPerPixel);
+                    for (int i = 0; i < palette.length; i++) {
+                        int[] color = palette[i];
+                        if (color[0] == red && color[1] == green && color[2] == blue) {
+                            decompressedData[index] = (byte) i;
+                        }
+                    }
+                }
+                pixels[pixelIndex++] = new Pixel((double) red / 255.0, (double) green / 255.0, (double) blue / 255.0);
+            }
+            rowStart += (bytesPerPixel * width) + 1;
+        }
+        return pixels;
     }
 
     private static void checkSignature(FileInputStream fis) throws IOException {
@@ -127,7 +209,6 @@ public class ParserPNG implements Parser {
     }
 
     private static byte[] decompress(List<Chunk> idatChunks) throws IOException {
-        // Объединяем данные всех блоков IDAT в один массив
         ByteArrayOutputStream bytesStream = new ByteArrayOutputStream();
         for (Chunk chunk : idatChunks) {
             bytesStream.write(chunk.data);
@@ -149,40 +230,32 @@ public class ParserPNG implements Parser {
         return baos.toByteArray();
     }
 
-    private static Pixel[] extractPixelData(byte[] decompressedData) {
-        Pixel[] pixels = new Pixel[width * height];
-
-        int bytesPerPixel = calculateBytesPerPixel(colorType, bitDepth);
-        int pixelIndex = 0;
-        int rowStart = 1;
-        for (int row = 0; row < height; row++) {
-            int filterType = decompressedData[row * (width * bytesPerPixel + 1)] & 0xFF;
-            System.out.println("filter " + filterType);
-
-            for (int col = 0; col < width; col++) {
-                int index = rowStart + col * bytesPerPixel;
-
-                int red, green, blue;
-                if (filterType == 0) { // None
-                    red = decompressedData[index] & 0xFF;
-                    green = decompressedData[index + 1] & 0xFF;
-                    blue = decompressedData[index + 2] & 0xFF;
-                } else {
-                    red = applyFilter(decompressedData, filterType, row, col, index, 0, bytesPerPixel);
-                    decompressedData[index] = (byte) red;
-                    green = applyFilter(decompressedData, filterType, row, col, index, 1, bytesPerPixel);
-                    decompressedData[index + 1] = (byte) green;
-                    blue = applyFilter(decompressedData, filterType, row, col, index, 2, bytesPerPixel);
-                    decompressedData[index + 2] = (byte) blue;
-                }
-                pixels[pixelIndex++] = new Pixel((double) red / 255.0, (double) green / 255.0, (double) blue / 255.0);
+    private static int applyStaticFilter(byte[] data, int filterType, int row, int col, int index, int colorOffset, int bytesPerPixel) {
+        try {
+            int byteValue = palette[data[index] & 0xFF][colorOffset] & 0xFF;
+            switch (filterType) {
+                case 1: // Sub
+                    return col > 0 ? (byteValue + palette[data[index - bytesPerPixel] & 0xFF][colorOffset] & 0xFF) % 256 : byteValue;
+                case 2: // Up
+                    return row > 0 ? (byteValue + palette[data[index - (width * bytesPerPixel + 1)] & 0xFF][colorOffset] & 0xFF) % 256 : byteValue;
+                case 3: // Average
+                    int left = col > 0 ? palette[data[index - bytesPerPixel] & 0xFF][colorOffset] & 0xFF : 0;
+                    int up = row > 0 ? palette[data[index - (width * bytesPerPixel + 1)] & 0xFF][colorOffset] & 0xFF : 0;
+                    return (byteValue + Math.floorDiv(left + up, 2)) % 256;
+                case 4: // Paeth
+                    int a = col > 0 ? palette[data[index - bytesPerPixel] & 0xFF][colorOffset] & 0xFF : 0;
+                    int b = row > 0 ? palette[data[index - (width * bytesPerPixel + 1)] & 0xFF][colorOffset] & 0xFF : 0;
+                    int c = (col > 0 && row > 0) ? palette[data[index - (width * bytesPerPixel + 1) - bytesPerPixel] & 0xFF][colorOffset] & 0xFF : 0;
+                    return (byteValue + paethPredictor(a, b, c)) % 256;
+                default:
+                    return byteValue;
             }
-            rowStart += (bytesPerPixel * width) + 1;
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("data[index] " + data[index] + "     " + index);
         }
-
-        return pixels;
+        return 0;
     }
-    //TODO gamma, палитра, серые фотки, сохранение
+
 
     private static int applyFilter(byte[] data, int filterType, int row, int col, int index, int colorOffset, int bytesPerPixel) {
         int byteValue = data[index + colorOffset] & 0xFF;
@@ -205,6 +278,7 @@ public class ParserPNG implements Parser {
         }
     }
 
+
     private static int paethPredictor(int a, int b, int c) {
         int p = a + b - c;
         int pa = Math.abs(p - a);
@@ -213,30 +287,6 @@ public class ParserPNG implements Parser {
         if (pa <= pb && pa <= pc) return a;
         else if (pb <= pc) return b;
         else return c;
-    }
-
-    public static byte[] decodeIDATChunks(List<Chunk> idatChunks) throws IOException, DataFormatException {
-        // Объединяем данные всех блоков IDAT в один массив
-        ByteArrayOutputStream bytesStream = new ByteArrayOutputStream();
-        for (Chunk chunk : idatChunks) {
-            bytesStream.write(chunk.data);
-        }
-        byte[] compressedData = bytesStream.toByteArray();
-
-        // Расжимаем данные
-        Inflater inflater = new Inflater();
-        inflater.setInput(compressedData);
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        byte[] buffer = new byte[1024];
-        while (!inflater.finished()) {
-            int count = inflater.inflate(buffer);
-            outputStream.write(buffer, 0, count);
-        }
-        outputStream.close();
-
-        // Возвращаем расжатые данные
-        return outputStream.toByteArray();
     }
 
     public static int calculateBytesPerPixel(byte colorType, byte bitDepth) {
@@ -254,6 +304,29 @@ public class ParserPNG implements Parser {
             default:
                 throw new IllegalArgumentException("Unsupported color type.");
         }
+    }
+
+    public static int[][] extractPallet(Chunk chunk) {
+        if (chunk.data.length % 3 != 0) {
+            throw new IllegalArgumentException("Invalid PLTE data length.");
+        }
+
+        int numColors = chunk.data.length / 3;
+
+        int[][] newPalette = new int[numColors][3];
+
+        ByteBuffer plteBuffer = ByteBuffer.wrap(chunk.data).order(ByteOrder.BIG_ENDIAN);
+
+        for (int i = 0; i < numColors; i++) {
+            int red = plteBuffer.get() & 0xff;
+            int green = plteBuffer.get() & 0xff;
+            int blue = plteBuffer.get() & 0xff;
+
+            newPalette[i][0] = red;
+            newPalette[i][1] = green;
+            newPalette[i][2] = blue;
+        }
+        return newPalette;
     }
 
 }

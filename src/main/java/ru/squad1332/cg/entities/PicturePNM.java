@@ -57,6 +57,16 @@ public class PicturePNM implements Picture {
         return formatType;
     }
 
+    @Override
+    public double getGamma() {
+        return 0;
+    }
+
+    @Override
+    public void setGamma(double gamma) {
+        return;
+    }
+
     public void setFormatType(String formatType) {
         this.formatType = formatType;
     }
