@@ -29,5 +29,7 @@ public interface Picture {
 
     Pixel[] applyGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel);
 
+    byte getColorType();
+
     //Pixel[] convertGamma(Pixel[] pixelData, double curGamma, double newGamma, Mode curMode, Channel curChannel);
 }

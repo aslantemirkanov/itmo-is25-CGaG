@@ -117,65 +117,7 @@ public class PicturePNM implements Picture {
 
     @Override
     public void writeToFile(File file, Mode mode, Channel channel, double curGamma, Object dither, int bit) {
-        try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
-            if (dither != null) {
-                DitheringService.applyDithering(pixelData, dither.toString(), this.formatType, bit, width, height, curGamma);
-            }
-            pixelData = RGB_TO_OTHER.get(mode).apply(pixelData, channel);
-            if (channel.equals(Channel.ALL)) {
-                dataOutputStream.writeBytes(formatType + (char) (10));
-                dataOutputStream.writeBytes(String.valueOf(width) + (char) (32) + String.valueOf(height) + (char) (10));
-                dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
-
-                if (formatType.equals("P6")) {
-                    byte[] pixels = new byte[3 * height * width];
-                    int cur = 0;
-                    for (int i = 0; i < pixelData.length; i++) {
-                        cur = i * 3;
-                        Pixel curPixel = pixelData[i];
-                        int alpha = 255;
-                        double[] convert = curPixel.getColors();
-                        int first = (int) (convert[0] * 255);
-                        int second = (int) (convert[1] * 255);
-                        int third = (int) (convert[2] * 255);
-                        pixels[cur] = (byte) (first > 127 ? first - 256 : first);
-                        pixels[cur + 1] = (byte) (second > 127 ? second - 256 : second);
-                        pixels[cur + 2] = (byte) (third > 127 ? third - 256 : third);
-                    }
-                    ;
-                    dataOutputStream.write(pixels);
-                    dataOutputStream.close();
-                }
-
-                if (formatType.equals("P5")) {
-                    byte[] pixels = new byte[height * width];
-                    for (int i = 0; i < pixelData.length; i++) {
-                        int first = (int) (pixelData[i].getColors()[0] * 255);
-                        pixels[i] = (byte) (first > 127 ? first - 256 : first);
-                    }
-                    dataOutputStream.write(pixels);
-                }
-            } else {
-                dataOutputStream.writeBytes("P5" + (char) (10));
-                dataOutputStream.writeBytes(String.valueOf(width) + (char) (32) + String.valueOf(height) + (char) (10));
-                dataOutputStream.writeBytes(String.valueOf(maxColorValue) + (char) (10));
-
-                byte[] pixels = new byte[height * width];
-                for (int i = 0; i < pixelData.length; i++) {
-                    int first = 0;
-                    switch (channel) {
-                        case FIRST -> first = (int) (pixelData[i].getColors()[0] * 255);
-                        case SECOND -> first = (int) (pixelData[i].getColors()[1] * 255);
-                        case THIRD -> first = (int) (pixelData[i].getColors()[2] * 255);
-                    }
-                    pixels[i] = (byte) (first > 127 ? first - 256 : first);
-                }
-                dataOutputStream.write(pixels);
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Saver.writeToFile(file, this, mode, channel, curGamma, dither, bit);
     }
 
     @Override
@@ -243,6 +185,15 @@ public class PicturePNM implements Picture {
 
         System.out.println("INTERPRET GAMMA = " + newGamma + " APPLY");
         return copy;
+    }
+
+    @Override
+    public byte getColorType() {
+        if (formatType.equals("P6")){
+            return 2;
+        } else {
+            return 0;
+        }
     }
 
 }

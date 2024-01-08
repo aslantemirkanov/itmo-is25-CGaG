@@ -18,7 +18,7 @@ public class PictureService {
     private String path;
 
     private static final int SIGNATURE_SIZE = 8;
-    private static final byte[] PNG_SIGNATURE = new byte[]{(byte) 137, 80, 78, 71, 13, 10, 26, 10};
+    public static final byte[] PNG_SIGNATURE = new byte[]{(byte) 137, 80, 78, 71, 13, 10, 26, 10};
 
     public String getType(String filePath) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {

@@ -204,47 +204,16 @@ public class PicturePNG implements Picture {
     }
 
     @Override
-    public void writeToFile(File file, Mode mode, Channel channel, double curGamma, Object dither, int bit) {
-        try (DataOutputStream dataOutputStream = new DataOutputStream(new FileOutputStream(file))) {
-            if (dither != null) {
-                DitheringService.applyDithering(pixelData, dither.toString(), this.formatType, bit, width, height, curGamma);
-            }
-            //pixelData = RGB_TO_OTHER.get(mode).apply(pixelData, channel);
-            pixelData = GammaCorrection.convertGamma(pixelData, curGamma, 0);
-            boolean isIDATrecorded = false;
-            if (channel.equals(Channel.ALL)) {
-                for (byte b : PNG_SIGNATURE) {
-                    dataOutputStream.writeByte(b);
-                }
-                for (int i = 0; i < chunks.size(); i++) {
-                    Chunk chunk = chunks.get(i);
-
-                    if (chunk.type.equals("IDAT")){
-                        if (!isIDATrecorded){
-                            Chunk idat = compressIDAT(pixelData, width, height, bytesPerPixel, colorType);
-                            idat.writeChunk(dataOutputStream);
-                            isIDATrecorded = true;
-                        }
-                    } else {
-                        if (chunk.type.equals("gAMA")) {
-                            int gammaInt = (int) (gamma * 100000.0);
-                            byte[] gammaBytes = ByteBuffer.allocate(4).order(ByteOrder.BIG_ENDIAN).putInt(gammaInt).array();
-                            chunk.data = gammaBytes;
-                        }
-                        if (!chunk.type.equals("sRGB")) {
-                            chunks.get(i).writeChunk(dataOutputStream);
-                        }
-                    }
-
-                }
-            }
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    public byte getColorType() {
+        return colorType;
     }
 
-    private Chunk compressIDAT(Pixel[] pixelData, int width, int height, int bytesPerPixel, int colorType){
+    @Override
+    public void writeToFile(File file, Mode mode, Channel channel, double curGamma, Object dither, int bit) {
+        Saver.writeToFile(file, this, mode, channel, curGamma, dither, bit);
+    }
+
+    public static Chunk compressIDAT(Pixel[] pixelData, int width, int height, int bytesPerPixel, int colorType){
         byte[] pixelBytes = new byte[width * height * bytesPerPixel + height];
         int rowStart = 1;
         int counter = 0;
@@ -270,7 +239,7 @@ public class PicturePNG implements Picture {
     }
 
 
-    private byte[] deflateIDAT(byte[] input) {
+    public static byte[] deflateIDAT(byte[] input) {
         Deflater deflater = new Deflater();
         deflater.setInput(input);
         deflater.finish();
