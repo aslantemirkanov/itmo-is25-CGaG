@@ -32,6 +32,7 @@ import ru.squad1332.cg.draw.Wu;
 import ru.squad1332.cg.entities.Picture;
 import ru.squad1332.cg.entities.PicturePNM;
 import ru.squad1332.cg.entities.Pixel;
+import ru.squad1332.cg.filters.*;
 import ru.squad1332.cg.histogram.HistogramService;
 import ru.squad1332.cg.modes.Channel;
 import ru.squad1332.cg.modes.Mode;
@@ -576,5 +577,325 @@ public class MainController {
         HistogramService.drawHistogram(copy, mode, channel);
 
     }
+
+    public void onThresholding2(ActionEvent actionEvent) {
+        Thresholding2(new Stage());
+    }
+
+    public void Thresholding2(Stage primaryStage) {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Введите порог в диапазоне (0, 255)");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        TextField valueTextField = new TextField("125");
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Порог:"), 0, 0);
+        grid.add(valueTextField, 1, 0);
+
+        dialogPane.setContent(grid);
+        AtomicReference<String> valueString = new AtomicReference<>();
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                valueString.set(valueTextField.getText());
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+        System.out.println("Threshold: " + valueString.get());
+
+        try {
+            int value = Integer.parseInt(valueString.get());
+            if (value > 0 && value < 255) {
+                System.out.println(value + "ALL RIGHT");
+                picture.setPixelData(Thresholding2.filter(picture.getPixelData(), value));
+                draw(picture);
+
+            } else {
+                System.out.println("Неверное значение доли автокоррекции. Значение должно быть в диапазоне (0, 255)");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Значение доли автокоррекции неверное. Вы ввели не число!!!");
+        }
+
+    }
+
+    public void onThresholding3(ActionEvent actionEvent) {
+        Thresholding3(new Stage());
+    }
+
+    public void Thresholding3(Stage primaryStage) {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Введите пороги в диапазоне (0, 255)");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        TextField lowThresholdTextField = new TextField("100");
+        TextField highThresholdTextField = new TextField("200");
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Нижний порог:"), 0, 0);
+        grid.add(lowThresholdTextField, 1, 0);
+        grid.add(new Label("Верхний порог:"), 0, 1);
+        grid.add(highThresholdTextField, 1, 1);
+
+        dialogPane.setContent(grid);
+        AtomicReference<String> lowThresholdString = new AtomicReference<>();
+        AtomicReference<String> highThresholdString = new AtomicReference<>();
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                lowThresholdString.set(lowThresholdTextField.getText());
+                highThresholdString.set(highThresholdTextField.getText());
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+        System.out.println("Low Threshold: " + lowThresholdString.get());
+        System.out.println("High Threshold: " + highThresholdString.get());
+
+        try {
+            int lowThreshold = Integer.parseInt(lowThresholdString.get());
+            int highThreshold = Integer.parseInt(highThresholdString.get());
+
+            if (lowThreshold > 0 && lowThreshold < 255 && highThreshold > 0 && highThreshold < 255 && lowThreshold < highThreshold) {
+                System.out.println(lowThreshold + " and " + highThreshold + " ALL RIGHT");
+                picture.setPixelData(Thresholding3.filter(picture.getPixelData(), lowThreshold, highThreshold));
+                draw(picture);
+            } else {
+                System.out.println("Неверные значения порогов. Значения должны быть в диапазоне (0, 255), и нижний порог должен быть меньше верхнего.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Значения порогов неверные. Вы ввели не число!!!");
+        }
+    }
+
+    public void onOtsu2(ActionEvent actionEvent) {
+        picture.setPixelData(Otsu2.filter(picture.getPixelData()));
+        draw(picture);
+    }
+
+    public void onOtsu3(ActionEvent actionEvent) {
+        picture.setPixelData(Otsu3.filter(picture.getPixelData()));
+        draw(picture);
+    }
+
+    public void onMedianFilter(ActionEvent actionEvent) {
+        Median(new Stage());
+    }
+
+    public void Median(Stage primaryStage) {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Введите радиус ядра");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        TextField valueTextField = new TextField("1");
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Ядро:"), 0, 0);
+        grid.add(valueTextField, 1, 0);
+
+        dialogPane.setContent(grid);
+        AtomicReference<String> valueString = new AtomicReference<>();
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                valueString.set(valueTextField.getText());
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+        System.out.println("Kernel: " + valueString.get());
+
+        try {
+            int value = Integer.parseInt(valueString.get());
+            if (value > 0) {
+                System.out.println(value + "ALL RIGHT");
+                picture.setPixelData(MedianFilter.filter(picture.getPixelData(), picture.getWidth(),
+                        picture.getHeight(), value));
+                draw(picture);
+
+            } else {
+                System.out.println("Неверное значение ядра");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Значение доли автокоррекции неверное. Вы ввели не число!!!");
+        }
+
+    }
+
+
+    public void onLinearFilter(ActionEvent actionEvent) {
+        Linear(new Stage());
+    }
+
+    public void Linear(Stage primaryStage) {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Введите радиус ядра");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        TextField valueTextField = new TextField("1");
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Ядро:"), 0, 0);
+        grid.add(valueTextField, 1, 0);
+
+        dialogPane.setContent(grid);
+        AtomicReference<String> valueString = new AtomicReference<>();
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                valueString.set(valueTextField.getText());
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+        System.out.println("Kernel: " + valueString.get());
+
+        try {
+            int value = Integer.parseInt(valueString.get());
+            if (value > 0) {
+                System.out.println(value + "ALL RIGHT");
+                picture.setPixelData(LinearFilter.filter(picture.getPixelData(), picture.getWidth(),
+                        picture.getHeight(), value));
+                draw(picture);
+
+            } else {
+                System.out.println("Неверное значение ядра");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Значение доли автокоррекции неверное. Вы ввели не число!!!");
+        }
+
+    }
+
+    public void onUnsharpMasking(ActionEvent actionEvent) {
+        UnsharpMask(new Stage());
+    }
+
+    public void UnsharpMask(Stage primaryStage) {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Введите пороги в диапазоне (0, 255)");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        TextField amountField = new TextField("1");
+        TextField sigmaField = new TextField("2");
+        TextField thresholdField = new TextField("125");
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Amount:"), 0, 0);
+        grid.add(amountField, 1, 0);
+        grid.add(new Label("Sigma:"), 0, 1);
+        grid.add(sigmaField, 1, 1);
+        grid.add(new Label("Threshold:"), 0, 2);
+        grid.add(thresholdField, 1, 2);
+
+        dialogPane.setContent(grid);
+        AtomicReference<String> amountString = new AtomicReference<>();
+        AtomicReference<String> sigmaString = new AtomicReference<>();
+        AtomicReference<String> thresholdString = new AtomicReference<>();
+
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                amountString.set(amountField.getText());
+                sigmaString.set(sigmaField.getText());
+                thresholdString.set(thresholdField.getText());
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+        System.out.println("Amount: " + amountString.get());
+        System.out.println("Sigma: " + sigmaString.get());
+        System.out.println("Threshold: " + thresholdString.get());
+
+        try {
+            double amount = Double.parseDouble(amountString.get());
+            double sigma = Double.parseDouble(sigmaString.get());
+            int threshold = Integer.parseInt(thresholdString.get());
+
+            if (amount > 0 && amount < 5
+            && sigma > 0.1 && sigma < 12
+            && threshold > 0 && threshold < 255) {
+                System.out.println(" ALL RIGHT");
+                picture.setPixelData(UnsharpMasking.filter(picture.getPixelData(), picture.getWidth(), picture.getHeight(),
+                        amount, sigma, threshold));
+                draw(picture);
+            } else {
+                System.out.println("Неверные значения порогов. Значения должны быть в диапазоне (0, 255), и нижний порог должен быть меньше верхнего.");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Значения порогов неверные. Вы ввели не число!!!");
+        }
+    }
+
+    public void onGaussFilter(ActionEvent actionEvent) {
+        Gauss(new Stage());
+    }
+
+    public void Gauss(Stage primaryStage) {
+        Dialog<Pair<String, String>> dialog = new Dialog<>();
+        dialog.setTitle("Введите сигму");
+
+        DialogPane dialogPane = dialog.getDialogPane();
+        dialogPane.getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
+
+        TextField valueTextField = new TextField("1");
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Сигма:"), 0, 0);
+        grid.add(valueTextField, 1, 0);
+
+        dialogPane.setContent(grid);
+        AtomicReference<String> valueString = new AtomicReference<>();
+
+        dialog.setResultConverter(button -> {
+            if (button == ButtonType.OK) {
+                valueString.set(valueTextField.getText());
+            }
+            return null;
+        });
+
+        dialog.showAndWait();
+        System.out.println("Kernel: " + valueString.get());
+
+        try {
+            double value = Double.parseDouble(valueString.get());
+            if (value > 0) {
+                System.out.println(value + "ALL RIGHT");
+                picture.setPixelData(GaussFilter.filter(picture.getPixelData(), picture.getWidth(),
+                        picture.getHeight(), value));
+                draw(picture);
+
+            } else {
+                System.out.println("Неверное значение ядра");
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Значение доли автокоррекции неверное. Вы ввели не число!!!");
+        }
+
+    }
+
+    public void onSobelFilter(ActionEvent actionEvent) {
+        picture.setPixelData(SobelFilter.filter(picture.getPixelData(), picture.getWidth(),
+                picture.getHeight()));
+        draw(picture);
+    }
+
 
 }

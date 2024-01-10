@@ -102,6 +102,22 @@
                 </items>
             </Menu>
 
+            <Menu mnemonicParsing="false" text="Фильтрация">
+                <items>
+                    <MenuItem mnemonicParsing="false" onAction="#onThresholding2" text="Пороговая 2 класса" />
+                    <MenuItem mnemonicParsing="false" onAction="#onThresholding3" text="Пороговая 3 класса" />
+                    <MenuItem mnemonicParsing="false" onAction="#onOtsu2" text="Otsu 2 класса" />
+                    <MenuItem mnemonicParsing="false" onAction="#onOtsu3" text="Otsu 3 класса" />
+                    <MenuItem mnemonicParsing="false" onAction="#onMedianFilter" text="Медианная" />
+                    <MenuItem mnemonicParsing="false" onAction="#onGaussFilter" text="Фильтр Гаусса" />
+                    <MenuItem mnemonicParsing="false" onAction="#onLinearFilter" text="Линейный усредняющий" />
+                    <MenuItem mnemonicParsing="false" onAction="#onUnsharpMasking" text="Нерезкое маскирование" />
+<!--                    <MenuItem mnemonicParsing="false" onAction="#onAutoCorrection" text="CAS" />-->
+                    <MenuItem mnemonicParsing="false" onAction="#onSobelFilter" text="Фильтр Собеля" />
+<!--                    <MenuItem mnemonicParsing="false" onAction="#onAutoCorrection" text="Canny edge detector" />-->
+                </items>
+            </Menu>
+
 
             <Menu mnemonicParsing="false" text="Очистка">
                     <MenuItem mnemonicParsing="false" onAction="#clearBottomBar" text="Clear" />

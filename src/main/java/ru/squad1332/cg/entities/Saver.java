@@ -78,6 +78,13 @@ public class Saver {
                 Chunk gammaChunk = new Chunk("gAMA", gammaBytes);
                 gammaChunk.writeChunk(dataOutputStream);
 
+                //srgb
+                if (Math.abs(gamma - 0.45455) < 0.00001) {
+                    byte[] sRGBData = new byte[]{0};
+                    Chunk sRGBChunk = new Chunk("sRGB", sRGBData);
+                    sRGBChunk.writeChunk(dataOutputStream);
+                }
+
                 //iend
                 Chunk endChunk = new Chunk("IEND", new byte[0]);
                 endChunk.writeChunk(dataOutputStream);
